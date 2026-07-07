@@ -18,11 +18,8 @@
 const char* ssid = WIFI_SSID;
 const char* password = WIFI_PASSWORD;
 
-// Server manzili
-// DIQQAT: bu router DHCP bergan IP, qayta yoqilsa o'zgarishi mumkin — server
-// terminalidagi "Tarmoqda: http://<IP>:3000" qatoridan tekshirib turing.
-const char* SERVER_HOST = "10.146.85.59";
-const int   SERVER_PORT = 3000;
+// Server manzili — Vercel'ga deploy qilingan bulutli backend (HTTPS, port kerak emas)
+const char* SERVER_HOST = "qorlitog-server-v4.vercel.app";
 
 // Bu qurilmani serverda ajratish uchun nom (HeroBar'dagi onlayn/oflayn indikatori shu bo'yicha ishlaydi)
 const char* DEVICE_ID = "esp32-2";
@@ -99,10 +96,10 @@ void connectWiFi() {
 
 void sendUpdate(const char* name, const char* state) {
   HTTPClient http;
-  char url[64];
-  snprintf(url, sizeof(url), "http://%s:%d/api/update", SERVER_HOST, SERVER_PORT);
+  char url[96];
+  snprintf(url, sizeof(url), "https://%s/api/update", SERVER_HOST);
 
-  http.begin(url);
+  http.begin(client, url);
   http.addHeader("Content-Type", "application/json");
 
   StaticJsonDocument<256> doc;
@@ -178,10 +175,10 @@ void checkSignals() {
 
 void sendHeartbeat() {
   HTTPClient http;
-  char url[64];
-  snprintf(url, sizeof(url), "http://%s:%d/api/update", SERVER_HOST, SERVER_PORT);
+  char url[96];
+  snprintf(url, sizeof(url), "https://%s/api/update", SERVER_HOST);
 
-  http.begin(url);
+  http.begin(client, url);
   http.addHeader("Content-Type", "application/json");
 
   StaticJsonDocument<1024> doc;

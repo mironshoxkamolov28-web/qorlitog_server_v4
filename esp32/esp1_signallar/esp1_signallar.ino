@@ -12,9 +12,8 @@
 const char* ssid = WIFI_SSID;
 const char* password = WIFI_PASSWORD;
 
-// Server manzili (o'zgarsa server terminalidagi "Tarmoqda: http://<IP>:3000" ga qarang)
-const char* SERVER_HOST = "10.146.85.59";
-const int   SERVER_PORT = 3000;
+// Server manzili — Vercel'ga deploy qilingan bulutli backend (HTTPS, port kerak emas)
+const char* SERVER_HOST = "qorlitog-server-v4.vercel.app";
 const char* DEVICE_ID = "esp32-1";
 
 WiFiClientSecure client;
@@ -77,10 +76,10 @@ const char* toServerState(bool state) {
 
 void sendUpdate(const String& name, const char* state) {
   HTTPClient http;
-  char url[64];
-  snprintf(url, sizeof(url), "http://%s:%d/api/update", SERVER_HOST, SERVER_PORT);
+  char url[96];
+  snprintf(url, sizeof(url), "https://%s/api/update", SERVER_HOST);
 
-  http.begin(url);
+  http.begin(client, url);
   http.addHeader("Content-Type", "application/json");
 
   StaticJsonDocument<256> doc;
@@ -100,10 +99,10 @@ void sendUpdate(const String& name, const char* state) {
 
 void sendHeartbeat() {
   HTTPClient http;
-  char url[64];
-  snprintf(url, sizeof(url), "http://%s:%d/api/update", SERVER_HOST, SERVER_PORT);
+  char url[96];
+  snprintf(url, sizeof(url), "https://%s/api/update", SERVER_HOST);
 
-  http.begin(url);
+  http.begin(client, url);
   http.addHeader("Content-Type", "application/json");
 
   StaticJsonDocument<1024> doc;
