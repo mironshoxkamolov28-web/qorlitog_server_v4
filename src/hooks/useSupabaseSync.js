@@ -60,7 +60,15 @@ export function useSupabaseSync({ applySignalData, setArchiveList, isArchiveMode
         else if (['CLOSED', 'CHANNEL_ERROR', 'TIMED_OUT'].includes(status)) setConnStatus('reconnecting')
       })
 
-    return () => { supabase.removeChannel(channel) }
+    // Realtime ba'zan "ulangan" holatda qolib, yangi hodisalarni yetkazishni
+    // jimgina to'xtatib qo'yishi mumkin — shuning uchun useWebSocket'dagi kabi
+    // davriy zaxira (polling) qo'shildi.
+    const pollTimer = setInterval(() => loadStatus(), 5000)
+
+    return () => {
+      supabase.removeChannel(channel)
+      clearInterval(pollTimer)
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return { connStatus, loadStatus, fetchError, devices }
