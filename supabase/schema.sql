@@ -19,8 +19,9 @@ create table if not exists archive (
 
 create index if not exists archive_ts_idx on archive (ts desc);
 
--- Realtime: signals jadvalidagi o'zgarishlar frontendga jonli yuborilishi uchun
+-- Realtime: signals va archive jadvalidagi o'zgarishlar frontendga jonli yuborilishi uchun
 alter publication supabase_realtime add table signals;
+alter publication supabase_realtime add table archive;
 
 -- RLS: brauzer (anon key) faqat o'qiy oladi; yozish faqat service_role
 -- (Vercel serverless funksiyasi) orqali, u RLS'ni chetlab o'tadi.
