@@ -2,6 +2,14 @@ function Th({ children }) {
   return <th className="text-left p-2 text-muted2 text-[0.74rem] uppercase tracking-[0.1em]">{children}</th>
 }
 
+// Supabase arxivida faqat 'ts' (epoch ms) bor, 'time' matni yo'q —
+// shu holatda ts'dan hisoblab ko'rsatiladi.
+function formatTime(entry) {
+  if (entry.time) return entry.time
+  if (Number.isFinite(+entry.ts) && +entry.ts > 0) return new Date(+entry.ts).toLocaleString('uz-UZ')
+  return '—'
+}
+
 function StateBadge({ state }) {
   const open = state === 'green'
   return (
@@ -52,7 +60,7 @@ export default function ArchiveTable({ archiveList, onSelectTime, fetchError }) 
               >
                 <td className="p-2 font-semibold">{entry.name}</td>
                 <td className="p-2"><StateBadge state={entry.state} /></td>
-                <td className="p-2 font-mono text-muted text-[0.85rem]">{entry.time}</td>
+                <td className="p-2 font-mono text-muted text-[0.85rem]">{formatTime(entry)}</td>
                 <td className="p-2 text-muted2 text-[0.85rem]">{entry.device || '—'}</td>
               </tr>
             ))
