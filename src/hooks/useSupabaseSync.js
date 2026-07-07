@@ -63,7 +63,7 @@ export function useSupabaseSync({ applySignalData, setArchiveList, isArchiveMode
     // Realtime ba'zan "ulangan" holatda qolib, yangi hodisalarni yetkazishni
     // jimgina to'xtatib qo'yishi mumkin — shuning uchun useWebSocket'dagi kabi
     // davriy zaxira (polling) qo'shildi.
-    const pollTimer = setInterval(() => loadStatus(), 2000)
+    const pollTimer = setInterval(() => loadStatus(), 1000)
 
     return () => {
       supabase.removeChannel(channel)
