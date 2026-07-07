@@ -9,8 +9,8 @@ const STATUS = {
 
 // ESP32 shuncha vaqt (ms) sado bermasa "oflayn" deb ko'rsatiladi. ESP32
 // odatda har necha soniyada bir heartbeat yuboradi deb kutiladi — bu qiymat
-// firmware'dagi yuborish oralig'idan 2-3 baravar katta bo'lishi kerak.
-const DEVICE_OFFLINE_MS = 15000
+// firmware'dagi yuborish oralig'idan (hozir 10s) 2-3 baravar katta bo'lishi kerak.
+const DEVICE_OFFLINE_MS = 25000
 
 export default function HeroBar({ connStatus, devices }) {
   const [clock, setClock] = useState('--:--:--')

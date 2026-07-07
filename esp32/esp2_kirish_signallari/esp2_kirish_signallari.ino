@@ -245,7 +245,7 @@ void loop() {
   checkSignals();
 
   unsigned long now = millis();
-  if (now - lastHeartbeat > 500) {
+  if (now - lastHeartbeat > 10000) {
     lastHeartbeat = now;
     sendHeartbeat();
   }
