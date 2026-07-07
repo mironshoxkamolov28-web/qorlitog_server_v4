@@ -17,7 +17,26 @@ const char* SERVER_HOST = "qorlitog-server-v4.vercel.app";
 const char* DEVICE_ID = "esp32-1";
 
 WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken, client);
+
+// Telegram uchun alohida client: bot xabari fon vazifasida (background task)
+// asosiy tsikldan mustaqil yuboriladi — shu ikkalasi bitta socket'ni bo'lishib
+// olmasligi uchun ajratilgan (aks holda ikkalasi bir vaqtda ishlasa nosozlik chiqadi).
+WiFiClientSecure telegramClient;
+UniversalTelegramBot bot(BOTtoken, telegramClient);
+
+// Telegram xabarini fon vazifasida (0-yadroda) yuborish — asosiy tsikl
+// (signal tekshirish + serverga yuborish) Telegram javobini kutib turmaydi.
+void telegramTask(void* param) {
+  String* msgPtr = (String*)param;
+  bot.sendMessage(CHAT_ID, *msgPtr, "");
+  delete msgPtr;
+  vTaskDelete(NULL);
+}
+
+void sendTelegramAsync(const String& text) {
+  String* msgPtr = new String(text);
+  xTaskCreatePinnedToCore(telegramTask, "telegramTask", 10240, msgPtr, 1, NULL, 0);
+}
 
 const char* ntpServer = "pool.ntp.org";
 
@@ -152,6 +171,7 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   client.setInsecure();
+  telegramClient.setInsecure();
 
   configTime(18000, 0, ntpServer);
 
@@ -308,7 +328,7 @@ void loop() {
 
 
       sendUpdate(group1Names[i], toServerState(state));
-      bot.sendMessage(CHAT_ID, message, "");
+      sendTelegramAsync(message);
 
       Serial.println(message);
 
@@ -383,7 +403,7 @@ void loop() {
 
 
       sendUpdate(group2Names[i], toServerState(state));
-      bot.sendMessage(CHAT_ID, message, "");
+      sendTelegramAsync(message);
 
       Serial.println(message);
 
