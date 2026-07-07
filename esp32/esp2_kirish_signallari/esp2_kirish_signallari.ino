@@ -66,6 +66,13 @@ int pins[14] = {
 // Oxirgi holatlar
 bool lastState[14] = { LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW };
 
+// Debounce: rele/kontakt o'chganda bir necha marta "titrab" (bounce) tez-tez
+// HIGH/LOW almashishi mumkin — har bir titrash bloklovchi tarmoq so'rovi
+// yuborardi, natijada haqiqiy holat serverga yetguncha soniyalab kechikardi.
+bool lastRawState[14];
+unsigned long lastBounceTime[14] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+const unsigned long DEBOUNCE_MS = 50;
+
 // Vaqt hisoblagichlari (necha sekund band/ochiq bo'lganini bilish uchun)
 unsigned long changeStart[14] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -130,7 +137,14 @@ void sendTelegram(const String& text) {
 
 void checkSignals() {
   for (int i = 0; i < 14; i++) {
-    bool val = digitalRead(pins[i]);
+    bool raw = digitalRead(pins[i]);
+    if (raw != lastRawState[i]) {
+      lastRawState[i] = raw;
+      lastBounceTime[i] = millis();
+    }
+    if ((millis() - lastBounceTime[i]) < DEBOUNCE_MS) continue;
+
+    bool val = raw;
     if (val != lastState[i]) {
       String vaqt = getTimeStr();
       String message = "";
@@ -210,6 +224,7 @@ void setup() {
   for (int i = 0; i < 14; i++) {
     pinMode(pins[i], INPUT_PULLUP);
     lastState[i] = digitalRead(pins[i]);
+    lastRawState[i] = lastState[i];
     changeStart[i] = millis();
   }
 

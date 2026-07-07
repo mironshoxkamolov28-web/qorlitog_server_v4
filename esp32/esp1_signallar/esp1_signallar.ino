@@ -69,6 +69,15 @@ unsigned long onStart2[8];
 
 unsigned long lastHeartbeat = 0;
 
+// Debounce: rele/kontakt o'chganda bir necha marta "titrab" (bounce) tez-tez
+// HIGH/LOW almashishi mumkin — har bir titrash bloklovchi tarmoq so'rovi
+// yuborardi, natijada haqiqiy holat serverga yetguncha soniyalab kechikardi.
+bool rawState1[9];
+bool rawState2[8];
+unsigned long bounceStart1[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+unsigned long bounceStart2[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+const unsigned long DEBOUNCE_MS = 50;
+
 // Ikkala guruhda ham LOW = yashil (bo'sh/signal ochiq), HIGH = qizil (band/yopiq)
 const char* toServerState(bool state) {
   return state == LOW ? "green" : "red";
@@ -156,6 +165,7 @@ void setup() {
     pinMode(group1Pins[i], INPUT_PULLUP);
 
     oldState1[i] = digitalRead(group1Pins[i]);
+    rawState1[i] = oldState1[i];
   }
 
 
@@ -165,6 +175,7 @@ void setup() {
     pinMode(group2Pins[i], INPUT_PULLUP);
 
     oldState2[i] = digitalRead(group2Pins[i]);
+    rawState2[i] = oldState2[i];
   }
 
   sendHeartbeat();
@@ -235,7 +246,14 @@ void loop() {
 
   for(int i = 0; i < 9; i++) {
 
-    bool state = digitalRead(group1Pins[i]);
+    bool raw = digitalRead(group1Pins[i]);
+    if (raw != rawState1[i]) {
+      rawState1[i] = raw;
+      bounceStart1[i] = millis();
+    }
+    if ((millis() - bounceStart1[i]) < DEBOUNCE_MS) continue;
+
+    bool state = raw;
 
     if(state != oldState1[i]) {
 
@@ -304,7 +322,14 @@ void loop() {
 
   for(int i = 0; i < 8; i++) {
 
-    bool state = digitalRead(group2Pins[i]);
+    bool raw = digitalRead(group2Pins[i]);
+    if (raw != rawState2[i]) {
+      rawState2[i] = raw;
+      bounceStart2[i] = millis();
+    }
+    if ((millis() - bounceStart2[i]) < DEBOUNCE_MS) continue;
+
+    bool state = raw;
 
     if(state != oldState2[i]) {
 
