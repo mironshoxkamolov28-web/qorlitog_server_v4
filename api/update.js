@@ -17,26 +17,12 @@ export default async function handler(req, res) {
     return
   }
 
-  const { data: currentRows, error: fetchErr } = await supabase.from('signals').select('name, state')
-  if (fetchErr) {
-    res.status(500).json({ ok: false, error: fetchErr.message })
-    return
-  }
-  const current = Object.fromEntries((currentRows || []).map(r => [r.name, r.state]))
-
   const topDevice = data.device
   const signalUpdates = new Map() // name -> row
-  const archiveInserts = []
   const rejected = []
-  let recognized = 0
 
-  function apply(nm, st, device, ts) {
+  function apply(nm, st, device) {
     signalUpdates.set(nm, { name: nm, state: st, device: device || null, updated_at: new Date().toISOString() })
-    recognized++
-    if (current[nm] !== st) {
-      archiveInserts.push({ name: nm, state: st, device: device || null, ts: ts || Date.now() })
-      current[nm] = st
-    }
   }
 
   // 1) To'liq xarita: { signals: { "Ч1": "green", ... } } — heartbeat
@@ -56,7 +42,7 @@ export default async function handler(req, res) {
       const rawName = pick(ev, NAME_KEYS)
       const st = parseStateValue(pick(ev, STATE_KEYS))
       if (!rawName || !st) { rejected.push(JSON.stringify(ev).slice(0, 80)); return }
-      apply(normalizeSignalName(rawName), st, ev.device || topDevice, ev.ts)
+      apply(normalizeSignalName(rawName), st, ev.device || topDevice)
     })
   }
 
@@ -65,25 +51,21 @@ export default async function handler(req, res) {
   if (rawName !== undefined) {
     const st = parseStateValue(pick(data, STATE_KEYS))
     if (st) {
-      apply(normalizeSignalName(rawName), st, topDevice, data.ts)
+      apply(normalizeSignalName(rawName), st, topDevice)
     } else {
       rejected.push(`${rawName}: "${pick(data, STATE_KEYS)}"`)
     }
   }
 
-  if (signalUpdates.size) {
-    const { error: upsertErr } = await supabase.from('signals').upsert([...signalUpdates.values()], { onConflict: 'name' })
-    if (upsertErr) { res.status(500).json({ ok: false, error: upsertErr.message }); return }
-  }
-  if (archiveInserts.length) {
-    const { error: insertErr } = await supabase.from('archive').insert(archiveInserts)
-    if (insertErr) { res.status(500).json({ ok: false, error: insertErr.message }); return }
+  if (!signalUpdates.size) {
+    res.status(400).json({ ok: false, error: "Hech narsa qabul qilinmadi", rejected, kelganKalitlar: Object.keys(data) })
+    return
   }
 
-  const ok = recognized > 0
-  res.status(ok ? 200 : 400).json(
-    ok
-      ? { ok: true, applied: archiveInserts.map(a => `${a.name}→${a.state}`), unchanged: recognized - archiveInserts.length }
-      : { ok: false, error: "Hech narsa qabul qilinmadi", rejected, kelganKalitlar: Object.keys(data) }
-  )
+  // Bitta upsert — arxivga yozish (haqiqiy o'zgarganda) Postgres trigger orqali
+  // avtomatik bajariladi (supabase/schema.sql: log_signal_change).
+  const { error: upsertErr } = await supabase.from('signals').upsert([...signalUpdates.values()], { onConflict: 'name' })
+  if (upsertErr) { res.status(500).json({ ok: false, error: upsertErr.message }); return }
+
+  res.status(200).json({ ok: true, count: signalUpdates.size, rejected })
 }

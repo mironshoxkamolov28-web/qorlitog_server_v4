@@ -33,3 +33,23 @@ create policy "signals_public_read" on signals
 
 create policy "archive_public_read" on archive
   for select using (true);
+
+-- Arxivga yozishni Postgres'ning o'ziga topshirish: avval Vercel funksiyasi
+-- signals'ni SELECT qilib holatni qo'lda solishtirar, keyin alohida INSERT
+-- qilardi — bu ESP32'dan har bir so'rov uchun 3 ta ketma-ket Supabase
+-- so'rovi (va sekundlab kechikish) degani edi. Endi bitta UPSERT yetarli,
+-- haqiqiy o'zgarishni trigger o'zi aniqlab arxivga yozadi.
+create or replace function log_signal_change() returns trigger as $$
+begin
+  if (TG_OP = 'INSERT') or (NEW.state is distinct from OLD.state) then
+    insert into archive (name, state, device, ts)
+    values (NEW.name, NEW.state, NEW.device, (extract(epoch from NEW.updated_at) * 1000)::bigint);
+  end if;
+  return NEW;
+end;
+$$ language plpgsql;
+
+drop trigger if exists signals_archive_trigger on signals;
+create trigger signals_archive_trigger
+  after insert or update on signals
+  for each row execute function log_signal_change();
