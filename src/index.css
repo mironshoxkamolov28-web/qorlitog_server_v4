@@ -1,0 +1,297 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===================================================================
+   BASE — flat "dispetcher pulti" uslubi.
+   Rang faqat signal holatlarida; interfeys neytral to'q kulrang.
+   Monospace faqat raqamlar/vaqt uchun (tizim shriftlari — internetsiz
+   lokal tarmoqda ham ishlaydi).
+   =================================================================== */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    @apply text-white font-sans;
+    min-height: 100vh;
+    padding: 14px;
+    background: #10151b;
+  }
+}
+
+@layer components {
+  /* Yuzalar — flat, gradientsiz, soyasiz */
+  .surface-panel {
+    @apply border border-line;
+    background: #141920;
+  }
+  .surface-card {
+    background: #181d24;
+    border: 1px solid #232a33;
+  }
+
+  .eyebrow {
+    @apply uppercase tracking-[0.22em] text-[0.7rem] text-muted2;
+  }
+
+  /* Yumaloq teg (holat, soat, legenda) — neytral */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8rem];
+    background: #1b222b;
+    border: 1px solid #2b323c;
+    color: #c7d0da;
+  }
+
+  /* Tugmalar — bitta neytral uslub, gradientlarsiz */
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-[0.88rem] font-semibold cursor-pointer;
+    background: #1b222b;
+    border: 1px solid #2b323c;
+    color: #e8edf3;
+  }
+  .btn:hover {
+    background: #232a33;
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .input-flat {
+    @apply w-full rounded-lg p-2.5 font-mono text-[0.9rem];
+    background: #1b222b;
+    border: 1px solid #2b323c;
+    color: #e8edf3;
+  }
+  .input-flat:focus {
+    outline: none;
+    border-color: #4a5560;
+  }
+
+  /* Legenda elementlari */
+  .legend-item {
+    @apply inline-flex items-center gap-1.5 text-[0.78rem];
+    color: #9aa5b1;
+  }
+  .legend-line {
+    width: 14px;
+    height: 4px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .legend-dash {
+    width: 14px;
+    height: 0;
+    border-top: 3px dashed #5b6672;
+    display: inline-block;
+  }
+
+  /* ===================================================================
+     MONOSXEMA SHAKLLARI — barcha o'lchov va joylashuvlar STANDART
+     bo'yicha o'zgarmagan (Monosxema.jsx koordinatalariga tayanadi).
+     O'zgargani: ranglar flat, glow/soya yo'q.
+     =================================================================== */
+
+  .station-map {
+    position: relative;
+    width: 1920px;
+    min-height: 560px;
+    margin-top: 10px;
+    border-radius: 12px;
+    border: 1px solid #232a33;
+    background: #10151b;
+  }
+  /* Arxiv rejimida sxema atrofi sariq — "jonli emas" ogohlantirishi */
+  .station-map.archive {
+    border-color: rgba(240, 180, 41, 0.55);
+  }
+
+  /* --- Yo'l seksiyalari --- */
+  .track {
+    position: absolute;
+    height: 8px;
+    border-radius: 10px;
+    transform-origin: left center;
+    z-index: 2;
+  }
+  .track.free {
+    background: #3fa863;
+  }
+  .track.busy {
+    background: #d64545;
+  }
+  .track.minus {
+    background: #f0b429;
+  }
+  /* Nofaol strelka yo'nalishi — shtrix (fon rangidagi bo'shliqlar) */
+  .track.dashed {
+    opacity: 0.75;
+  }
+  .track.dashed::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 10px,
+      #10151b 10px,
+      #10151b 20px
+    );
+  }
+
+  /* --- Svetoforlar --- */
+  .signal {
+    position: absolute;
+    width: 46px;
+    height: 22px;
+    border-radius: 20px;
+    border: 2px solid #4a5560;
+    background: #0d1117;
+    z-index: 5;
+  }
+  .signal::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    top: 1px;
+    left: 2px;
+    background: #2a323c; /* o'chiq lampa */
+  }
+  .signal.green::before {
+    background: #34c759;
+  }
+  .signal.red::before {
+    background: #e5484d;
+  }
+
+  /* --- Kirish strelka-svetofori (arrow) --- */
+  .signal.signal-arrow {
+    width: 62px;
+    height: 22px;
+    border-radius: 3px;
+  }
+  .signal.signal-arrow::before {
+    top: 2px;
+    left: 3px;
+    width: 52px;
+    height: 14px;
+    border-radius: 0;
+    background: #2a323c;
+    clip-path: polygon(0% 50%, 15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%);
+  }
+  .signal.signal-arrow.green::before {
+    background: #34c759;
+  }
+  .signal.signal-arrow.red::before {
+    background: #e5484d;
+  }
+  .signal.signal-arrow.yellow::before {
+    background: #f0b429;
+  }
+
+  /* --- Kvadrat indikator --- */
+  .signal.signal-square {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+  }
+  .signal.signal-square::before {
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 0;
+    background: #2a323c;
+  }
+  .signal.signal-square.green::before {
+    background: #34c759;
+  }
+  .signal.signal-square.red::before {
+    background: #e5484d;
+  }
+  .signal.signal-square.yellow::before {
+    background: #f0b429;
+  }
+
+  /* --- Strelka holati indikatori --- */
+  .signal.signal-switch {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #4a5560;
+    background: #161c23;
+  }
+  .signal.signal-switch::before {
+    width: 12px;
+    height: 12px;
+    top: 4px;
+    left: 4px;
+    background: #2a323c;
+  }
+  .signal.signal-switch.green::before {
+    background: #34c759;
+  }
+  .signal.signal-switch.yellow::before {
+    background: #f0b429;
+  }
+
+  /* --- Yozuvlar — soyasiz, bir xil rang tizimi --- */
+  .name {
+    position: absolute;
+    font-size: 22px;
+    font-weight: 700;
+    color: #cfd7e0;
+  }
+  .section {
+    position: absolute;
+    font-size: 24px;
+    font-weight: 700;
+    color: #e8edf3;
+    z-index: 6;
+  }
+  .switch-label {
+    position: absolute;
+    font-size: 16px;
+    font-weight: 700;
+    color: #9aa5b1;
+    z-index: 6;
+  }
+  /* --- Live / Arxiv markeri --- */
+  .archive-marker {
+    position: absolute;
+    top: 78px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #1b222b;
+    border: 1px solid #2b323c;
+    color: #c7d0da;
+    font-size: 0.86rem;
+    z-index: 10;
+  }
+  .archive-marker::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34c759;
+  }
+  .archive-marker.is-archive {
+    border-color: rgba(240, 180, 41, 0.55);
+  }
+  .archive-marker.is-archive::before {
+    background: #f0b429;
+  }
+}
