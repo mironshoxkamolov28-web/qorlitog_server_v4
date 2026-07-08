@@ -12,7 +12,11 @@ const STATUS = {
 // firmware'dagi yuborish oralig'idan (hozir 10s) 2-3 baravar katta bo'lishi kerak.
 const DEVICE_OFFLINE_MS = 25000
 
-export default function HeroBar({ connStatus, devices }) {
+// Faqat shu naqshga mos qurilmalar ko'rsatiladi — test/qo'lda yozilgan
+// tasodifiy device nomlari (masalan debug skriptlaridan) chiqmasligi uchun.
+const KNOWN_DEVICE_RE = /^esp32-\d+$/
+
+export default function HeroBar({ connStatus, devices, theme, onToggleTheme, onOpenArchive, onOpenStats }) {
   const [clock, setClock] = useState('--:--:--')
 
   useEffect(() => {
@@ -23,7 +27,7 @@ export default function HeroBar({ connStatus, devices }) {
   }, [])
 
   const st = STATUS[connStatus] || STATUS.connecting
-  const deviceEntries = Object.entries(devices || {})
+  const deviceEntries = Object.entries(devices || {}).filter(([id]) => KNOWN_DEVICE_RE.test(id))
 
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3 px-4 py-3 rounded-xl border border-line bg-ink-850">
@@ -47,6 +51,20 @@ export default function HeroBar({ connStatus, devices }) {
           )
         })}
         <span className="chip font-mono">{clock}</span>
+        <button type="button" onClick={onOpenStats} className="btn">
+          Statistika
+        </button>
+        <button type="button" onClick={onOpenArchive} className="btn">
+          Arxiv
+        </button>
+        <button
+          type="button"
+          onClick={onToggleTheme}
+          className="btn"
+          title={theme === 'dark' ? "Yorug' rejimga o'tish" : "Tungi rejimga o'tish"}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </div>
     </header>
   )

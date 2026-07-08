@@ -26,7 +26,7 @@ export default function ArchiveTable({ archiveList, onSelectTime, fetchError }) 
   const list = hasRows ? archiveList.slice(0, 100) : []
 
   return (
-    <section className="surface-panel rounded-xl p-4 mt-3">
+    <div>
       <div className="flex justify-between items-end gap-2.5 mb-3.5">
         <div>
           <p className="eyebrow">Signal arxivi</p>
@@ -56,7 +56,7 @@ export default function ArchiveTable({ archiveList, onSelectTime, fetchError }) 
               <tr
                 key={`${entry.ts || entry.time}-${entry.name}-${i}`}
                 onClick={() => onSelectTime(entry)}
-                className="cursor-pointer border-b border-line hover:bg-[#181d24]"
+                className="cursor-pointer border-b border-line hover:bg-ink-800"
               >
                 <td className="p-2 font-semibold">{entry.name}</td>
                 <td className="p-2"><StateBadge state={entry.state} /></td>
@@ -67,6 +67,6 @@ export default function ArchiveTable({ archiveList, onSelectTime, fetchError }) 
           )}
         </tbody>
       </table>
-    </section>
+    </div>
   )
 }

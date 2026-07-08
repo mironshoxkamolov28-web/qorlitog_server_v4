@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { normalizeSignalName } from '../utils/signalNames'
 
 const TRACKS = [
@@ -75,15 +76,32 @@ const SECTIONS = [
   { name: 'IVП',    left: 900,  top: 345, label: 'IVП' },
 ]
 
-const LEGEND = [
-  { swatch: 'line', color: '#3fa863', text: 'Yashil — ochiq' },
-  { swatch: 'line', color: '#d64545', text: 'Qizil — band' },
-  { swatch: 'dot',  color: '#f0b429', text: 'Sariq — kirish / strelka МК (−)' },
-  { swatch: 'dot',  color: '#34c759', text: 'Strelka ПК (+)' },
-  { swatch: 'dash', text: "Nofaol yo'nalish" },
-]
+// Sxema shu o'lchov uchun chizilgan (Monosxema koordinatalari shunga mos) —
+// kichikroq ekranlarda wrapper transform: scale() orqali shu nisbatda kichraytiradi.
+const NATURAL_WIDTH = 1920
+const NATURAL_HEIGHT = 560
+
+function useAutoScale() {
+  const containerRef = useRef(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const ro = new ResizeObserver(entries => {
+      const w = entries[0].contentRect.width
+      if (w > 0) setScale(Math.min(1, w / NATURAL_WIDTH))
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  return { containerRef, scale }
+}
 
 export default function Monosxema({ signalStates, isArchiveMode }) {
+  const { containerRef, scale } = useAutoScale()
+
   const getState = (name) => {
     const norm = normalizeSignalName(name)
     return signalStates[norm] || 'red'
@@ -103,95 +121,88 @@ export default function Monosxema({ signalStates, isArchiveMode }) {
   }
 
   return (
-    <section className="surface-panel rounded-xl relative min-h-[470px] mb-3.5 overflow-x-auto overflow-y-hidden pt-3.5 px-3.5 pb-[18px]">
-      <div className="flex justify-between items-start gap-3 mb-2">
-        <div>
-          <p className="eyebrow">Monosxema</p>
-        </div>
-        <div className="flex gap-2 flex-wrap justify-end">
-          {LEGEND.map((l, i) => (
-            <span key={`lg-${i}`} className="legend-item">
-              {l.swatch === 'line' && <span className="legend-line" style={{ background: l.color }} />}
-              {l.swatch === 'dot' && <span className="legend-dot" style={{ background: l.color }} />}
-              {l.swatch === 'dash' && <span className="legend-dash" />}
-              {l.text}
+    <section className="surface-panel rounded-xl relative mb-3.5 pt-3.5 px-3.5 pb-[18px]">
+      <div className="mb-2">
+        <p className="eyebrow">Monosxema</p>
+      </div>
+
+      <div ref={containerRef} style={{ width: '100%', height: NATURAL_HEIGHT * scale, overflow: 'hidden' }}>
+        <div
+          className={`station-map ${isArchiveMode ? 'archive' : ''}`}
+          style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
+        >
+          <h3 className="absolute left-[140px] top-5 font-bold text-[1rem] text-muted">Buxoro tomoni</h3>
+          <h3 className="absolute right-[240px] top-5 font-bold text-[1rem] text-muted">Miskent tomoni</h3>
+
+          {TRACKS.map((t, i) => (
+            <div
+              key={`track-${i}`}
+              className={`track ${trackState(t)}`}
+              style={{
+                left: t.left,
+                top: t.top,
+                width: t.w,
+                transform: t.rot ? `rotate(${t.rot})` : undefined
+                /* Eslatma: inline backgroundColor olib tashlandi — inline stil
+                   .free/.busy klass ranglaridan har doim ustun bo'lib,
+                   yo'l rangi holatga qarab o'zgarmay qolardi. */
+              }}
+            />
+          ))}
+
+          {SIGNALS.map((s, i) => (
+            <div key={`sig-${i}`}>
+              {/* ПС/ПП, КП, ДСО/ПП (type bor) — ikki holatli indikatorlar:
+                  ESP32 pinida signal BOR  -> "green" yuboriladi -> QIZIL yonadi
+                  ESP32 pinida signal YO'Q -> "red"   yuboriladi -> SARIQ yonadi
+                  Yashil bu indikatorlarda umuman ishlatilmaydi. */}
+              <div
+                className={`signal ${s.type} ${s.type ? (getState(s.name) === 'red' ? 'yellow' : 'red') : getState(s.name)}`}
+                data-state={getState(s.name)}
+                style={{ left: s.sigLeft, top: s.sigTop }}
+              />
+              <span className="name" style={{ left: s.labelLeft, top: s.labelTop }}>
+                {s.display}
+              </span>
+            </div>
+          ))}
+
+          {SWITCHES.map((s, i) => (
+            <div key={`sw-${i}`}>
+              <div
+                className={`signal signal-switch ${getState(s.name) === 'green' ? s.colorType : ''}`}
+                data-state={getState(s.name)}
+                style={{ left: s.sigLeft, top: s.sigTop }}
+              />
+              <span className="switch-label" style={{ left: s.labelLeft, top: s.labelTop }}>
+                {s.display}
+              </span>
+            </div>
+          ))}
+
+          {SWITCH_LABELS.map((sl, i) => (
+            <span key={`swl-${i}`} className="section" style={{ left: sl.left, top: sl.top }}>
+              {sl.text}
+            </span>
+          ))}
+
+          <div
+            className={`archive-marker ${isArchiveMode ? 'is-archive' : ''}`}
+            style={{ left: '50%', transform: 'translateX(-50%)' }}
+          >
+            {isArchiveMode ? 'Arxiv' : 'Live'}
+          </div>
+
+          {SECTIONS.map((sec, i) => (
+            <span
+              key={`sec-${i}`}
+              className={`section ${isFree(sec.name) ? 'free' : 'busy'}`}
+              style={{ left: sec.left, top: sec.top }}
+            >
+              {sec.label}
             </span>
           ))}
         </div>
-      </div>
-
-      <h3 className="absolute left-[140px] top-5 font-bold text-[1rem] text-muted">Buxoro tomoni</h3>
-      <h3 className="absolute right-[240px] top-5 font-bold text-[1rem] text-muted">Miskent tomoni</h3>
-
-      <div className={`station-map ${isArchiveMode ? 'archive' : ''}`}>
-        {TRACKS.map((t, i) => (
-          <div
-            key={`track-${i}`}
-            className={`track ${trackState(t)}`}
-            style={{
-              left: t.left,
-              top: t.top,
-              width: t.w,
-              transform: t.rot ? `rotate(${t.rot})` : undefined
-              /* Eslatma: inline backgroundColor olib tashlandi — inline stil
-                 .free/.busy klass ranglaridan har doim ustun bo'lib,
-                 yo'l rangi holatga qarab o'zgarmay qolardi. */
-            }}
-          />
-        ))}
-
-        {SIGNALS.map((s, i) => (
-          <div key={`sig-${i}`}>
-            {/* ПС/ПП, КП, ДСО/ПП (type bor) — ikki holatli indikatorlar:
-                ESP32 pinida signal BOR  -> "green" yuboriladi -> QIZIL yonadi
-                ESP32 pinida signal YO'Q -> "red"   yuboriladi -> SARIQ yonadi
-                Yashil bu indikatorlarda umuman ishlatilmaydi. */}
-            <div
-              className={`signal ${s.type} ${s.type ? (getState(s.name) === 'red' ? 'yellow' : 'red') : getState(s.name)}`}
-              data-state={getState(s.name)}
-              style={{ left: s.sigLeft, top: s.sigTop }}
-            />
-            <span className="name" style={{ left: s.labelLeft, top: s.labelTop }}>
-              {s.display}
-            </span>
-          </div>
-        ))}
-
-        {SWITCHES.map((s, i) => (
-          <div key={`sw-${i}`}>
-            <div
-              className={`signal signal-switch ${getState(s.name) === 'green' ? s.colorType : ''}`}
-              data-state={getState(s.name)}
-              style={{ left: s.sigLeft, top: s.sigTop }}
-            />
-            <span className="switch-label" style={{ left: s.labelLeft, top: s.labelTop }}>
-              {s.display}
-            </span>
-          </div>
-        ))}
-
-        {SWITCH_LABELS.map((sl, i) => (
-          <span key={`swl-${i}`} className="section" style={{ left: sl.left, top: sl.top }}>
-            {sl.text}
-          </span>
-        ))}
-
-        <div
-          className={`archive-marker ${isArchiveMode ? 'is-archive' : ''}`}
-          style={{ left: '50%', transform: 'translateX(-50%)' }}
-        >
-          {isArchiveMode ? 'Arxiv' : 'Live'}
-        </div>
-
-        {SECTIONS.map((sec, i) => (
-          <span
-            key={`sec-${i}`}
-            className={`section ${isFree(sec.name) ? 'free' : 'busy'}`}
-            style={{ left: sec.left, top: sec.top }}
-          >
-            {sec.label}
-          </span>
-        ))}
       </div>
     </section>
   )

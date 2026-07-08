@@ -4,19 +4,60 @@
 
 /* ===================================================================
    BASE — flat "dispetcher pulti" uslubi.
-   Rang faqat signal holatlarida; interfeys neytral to'q kulrang.
+   Rang faqat signal holatlarida; interfeys neytral.
+   Barcha neytral ranglar CSS o'zgaruvchilari orqali — dark/light
+   rejim shu o'zgaruvchilarni :root[data-theme] bilan almashtiradi.
    Monospace faqat raqamlar/vaqt uchun (tizim shriftlari — internetsiz
    lokal tarmoqda ham ishlaydi).
    =================================================================== */
+:root {
+  --ink-950: #0d1117;
+  --ink-900: #10151b;
+  --ink-850: #141920;
+  --ink-800: #181d24;
+  --control: #1b222b;
+  --edge: #2b323c;
+  --accent: #8b9bad;
+  --sky2: #c7d0da;
+  --muted: #9aa5b1;
+  --muted2: #7d8896;
+  --line: #232a33;
+  --text-strong: #cfd7e0;
+  --text-strongest: #e8edf3;
+  --lamp-off: #2a323c;
+  --signal-border: #4a5560;
+  --track-dashed-gap: var(--ink-900);
+}
+
+:root[data-theme="light"] {
+  --ink-950: #f3f4f6;
+  --ink-900: #eef1f4;
+  --ink-850: #ffffff;
+  --ink-800: #f6f7f9;
+  --control: #e9ebee;
+  --edge: #d3d7dc;
+  --accent: #5b6472;
+  --sky2: #2b3440;
+  --muted: #5b6472;
+  --muted2: #6b7480;
+  --line: #dde1e6;
+  --text-strong: #1f2937;
+  --text-strongest: #111827;
+  --lamp-off: #c7ccd3;
+  --signal-border: #9aa5b1;
+  --track-dashed-gap: var(--ink-900);
+}
+
 @layer base {
   * {
     box-sizing: border-box;
   }
   body {
-    @apply text-white font-sans;
+    @apply font-sans;
     min-height: 100vh;
     padding: 14px;
-    background: #10151b;
+    background: var(--ink-900);
+    color: var(--text-strongest);
   }
 }
 
@@ -24,11 +65,11 @@
   /* Yuzalar — flat, gradientsiz, soyasiz */
   .surface-panel {
     @apply border border-line;
-    background: #141920;
+    background: var(--ink-850);
   }
   .surface-card {
-    background: #181d24;
-    border: 1px solid #232a33;
+    background: var(--ink-800);
+    border: 1px solid var(--line);
   }
 
   .eyebrow {
@@ -38,20 +79,20 @@
   /* Yumaloq teg (holat, soat, legenda) — neytral */
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[0.8rem];
-    background: #1b222b;
-    border: 1px solid #2b323c;
-    color: #c7d0da;
+    background: var(--control);
+    border: 1px solid var(--edge);
+    color: var(--sky2);
   }
 
   /* Tugmalar — bitta neytral uslub, gradientlarsiz */
   .btn {
     @apply inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-[0.88rem] font-semibold cursor-pointer;
-    background: #1b222b;
-    border: 1px solid #2b323c;
-    color: #e8edf3;
+    background: var(--control);
+    border: 1px solid var(--edge);
+    color: var(--text-strongest);
   }
   .btn:hover {
-    background: #232a33;
+    background: var(--edge);
   }
   .btn:active {
     transform: scale(0.98);
@@ -59,53 +100,28 @@
 
   .input-flat {
     @apply w-full rounded-lg p-2.5 font-mono text-[0.9rem];
-    background: #1b222b;
-    border: 1px solid #2b323c;
-    color: #e8edf3;
+    background: var(--control);
+    border: 1px solid var(--edge);
+    color: var(--text-strongest);
   }
   .input-flat:focus {
     outline: none;
-    border-color: #4a5560;
-  }
-
-  /* Legenda elementlari */
-  .legend-item {
-    @apply inline-flex items-center gap-1.5 text-[0.78rem];
-    color: #9aa5b1;
-  }
-  .legend-line {
-    width: 14px;
-    height: 4px;
-    border-radius: 2px;
-    display: inline-block;
-  }
-  .legend-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .legend-dash {
-    width: 14px;
-    height: 0;
-    border-top: 3px dashed #5b6672;
-    display: inline-block;
+    border-color: var(--accent);
   }
 
   /* ===================================================================
      MONOSXEMA SHAKLLARI — barcha o'lchov va joylashuvlar STANDART
      bo'yicha o'zgarmagan (Monosxema.jsx koordinatalariga tayanadi).
-     O'zgargani: ranglar flat, glow/soya yo'q.
+     Tashqi wrapper transform: scale() orqali ekran kengligiga moslaydi.
      =================================================================== */
 
   .station-map {
     position: relative;
     width: 1920px;
     min-height: 560px;
-    margin-top: 10px;
     border-radius: 12px;
-    border: 1px solid #232a33;
-    background: #10151b;
+    border: 1px solid var(--line);
+    background: var(--ink-900);
   }
   /* Arxiv rejimida sxema atrofi sariq — "jonli emas" ogohlantirishi */
   .station-map.archive {
@@ -142,8 +158,8 @@
       90deg,
       transparent 0px,
       transparent 10px,
-      #10151b 10px,
-      #10151b 20px
+      var(--track-dashed-gap) 10px,
+      var(--track-dashed-gap) 20px
     );
   }
 
@@ -153,8 +169,8 @@
     width: 46px;
     height: 22px;
     border-radius: 20px;
-    border: 2px solid #4a5560;
-    background: #0d1117;
+    border: 2px solid var(--signal-border);
+    background: var(--ink-950);
     z-index: 5;
   }
   .signal::before {
@@ -165,7 +181,7 @@
     border-radius: 50%;
     top: 1px;
     left: 2px;
-    background: #2a323c; /* o'chiq lampa */
+    background: var(--lamp-off);
   }
   .signal.green::before {
     background: #34c759;
@@ -186,7 +202,7 @@
     width: 52px;
     height: 14px;
     border-radius: 0;
-    background: #2a323c;
+    background: var(--lamp-off);
     clip-path: polygon(0% 50%, 15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%);
   }
   .signal.signal-arrow.green::before {
@@ -211,7 +227,7 @@
     width: 18px;
     height: 18px;
     border-radius: 0;
-    background: #2a323c;
+    background: var(--lamp-off);
   }
   .signal.signal-square.green::before {
     background: #34c759;
@@ -228,15 +244,15 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 2px solid #4a5560;
-    background: #161c23;
+    border: 2px solid var(--signal-border);
+    background: var(--ink-950);
   }
   .signal.signal-switch::before {
     width: 12px;
     height: 12px;
     top: 4px;
     left: 4px;
-    background: #2a323c;
+    background: var(--lamp-off);
   }
   .signal.signal-switch.green::before {
     background: #34c759;
@@ -250,20 +266,20 @@
     position: absolute;
     font-size: 22px;
     font-weight: 700;
-    color: #cfd7e0;
+    color: var(--text-strong);
   }
   .section {
     position: absolute;
     font-size: 24px;
     font-weight: 700;
-    color: #e8edf3;
+    color: var(--text-strongest);
     z-index: 6;
   }
   .switch-label {
     position: absolute;
     font-size: 16px;
     font-weight: 700;
-    color: #9aa5b1;
+    color: var(--muted);
     z-index: 6;
   }
   /* --- Live / Arxiv markeri --- */
@@ -275,9 +291,9 @@
     gap: 7px;
     padding: 6px 12px;
     border-radius: 999px;
-    background: #1b222b;
-    border: 1px solid #2b323c;
-    color: #c7d0da;
+    background: var(--control);
+    border: 1px solid var(--edge);
+    color: var(--sky2);
     font-size: 0.86rem;
     z-index: 10;
   }
@@ -293,5 +309,24 @@
   }
   .archive-marker.is-archive::before {
     background: #f0b429;
+  }
+
+  /* --- Modal (Arxiv / Statistika oynalari) --- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.55);
+  }
+  .modal-panel {
+    width: 100%;
+    max-width: 860px;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 14px;
   }
 }

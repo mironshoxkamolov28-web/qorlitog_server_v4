@@ -1,7 +1,8 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSignalState } from './hooks/useSignalState'
 import { useWebSocket } from './hooks/useWebSocket'
 import { useSupabaseSync } from './hooks/useSupabaseSync'
+import { useTheme } from './hooks/useTheme'
 import { normalizeSignalName } from './utils/signalNames'
 
 // VITE_SUPABASE_URL berilgan bo'lsa — bulutli (Supabase) manba, aks holda
@@ -13,6 +14,8 @@ import Monosxema from './components/Monosxema'
 import StatsPanel from './components/StatsPanel'
 import ArchivePanel from './components/ArchivePanel'
 import ArchiveTable from './components/ArchiveTable'
+import SignalStatsModal from './components/SignalStatsModal'
+import Modal from './components/Modal'
 
 // Arxiv yozuvining vaqtini olish.
 // 1) Yangi yozuvlarda server 'ts' (epoch ms) beradi — eng ishonchli yo'l.
@@ -62,6 +65,10 @@ export default function App() {
     isArchiveMode
   })
 
+  const { theme, toggleTheme } = useTheme()
+  const [showArchive, setShowArchive] = useState(false)
+  const [showStats, setShowStats] = useState(false)
+
   const handleShowArchive = useCallback((targetDate) => {
     const snapshot = computeSnapshotAt(targetDate, archiveList)
     if (!snapshot || Object.keys(snapshot).length === 0) {
@@ -70,6 +77,7 @@ export default function App() {
     }
     applySnapshot(snapshot)
     setArchiveMode(true)
+    setShowArchive(false)
   }, [archiveList, applySnapshot, setArchiveMode])
 
   const handleRealtime = useCallback(() => {
@@ -93,22 +101,40 @@ export default function App() {
 
   return (
     <main className="w-full min-h-screen">
-      <HeroBar connStatus={connStatus} devices={devices} />
+      <HeroBar
+        connStatus={connStatus}
+        devices={devices}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onOpenArchive={() => setShowArchive(true)}
+        onOpenStats={() => setShowStats(true)}
+      />
       <Monosxema signalStates={signalStates} isArchiveMode={isArchiveMode} />
       <StatsPanel signalStates={signalStates} />
-      <ArchivePanel
-        archiveList={archiveList}
-        onShowArchive={handleShowArchive}
-        onRealtime={handleRealtime}
-        connStatus={connStatus}
-        archiveCount={archiveList.length}
-        fetchError={fetchError}
-      />
-      <ArchiveTable
-        archiveList={archiveList}
-        onSelectTime={handleArchiveRowClick}
-        fetchError={fetchError}
-      />
+
+      {showArchive && (
+        <Modal title="Arxiv" onClose={() => setShowArchive(false)}>
+          <ArchivePanel
+            archiveList={archiveList}
+            onShowArchive={handleShowArchive}
+            onRealtime={handleRealtime}
+            connStatus={connStatus}
+            archiveCount={archiveList.length}
+            fetchError={fetchError}
+          />
+          <ArchiveTable
+            archiveList={archiveList}
+            onSelectTime={handleArchiveRowClick}
+            fetchError={fetchError}
+          />
+        </Modal>
+      )}
+
+      {showStats && (
+        <Modal title="24 soatlik statistika" onClose={() => setShowStats(false)}>
+          <SignalStatsModal archiveList={archiveList} />
+        </Modal>
+      )}
     </main>
   )
 }

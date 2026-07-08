@@ -6,24 +6,28 @@ export default {
   theme: {
     extend: {
       colors: {
+        // CSS o'zgaruvchilariga ishora — qiymatlar index.css'dagi
+        // :root / :root[data-theme="light"] bloklarida (dark/light rejim).
         ink: {
-          950: '#0d1117', // svetofor korpusi
-          900: '#10151b', // sahifa foni / monosxema maydoni
-          850: '#141920', // panel
-          800: '#181d24', // karta (ichki blok)
+          950: 'var(--ink-950)', // svetofor korpusi
+          900: 'var(--ink-900)', // sahifa foni / monosxema maydoni
+          850: 'var(--ink-850)', // panel
+          800: 'var(--ink-800)', // karta (ichki blok)
         },
-        control: '#1b222b', // tugma/input foni
-        edge: '#2b323c',    // tugma/input chegarasi
-        accent: '#8b9bad',  // eyebrow (neytral!)
-        sky2: '#c7d0da',
-        muted: '#9aa5b1',
-        muted2: '#7d8896',
+        control: 'var(--control)', // tugma/input foni
+        edge: 'var(--edge)',       // tugma/input chegarasi
+        accent: 'var(--accent)',   // eyebrow (neytral!)
+        sky2: 'var(--sky2)',
+        muted: 'var(--muted)',
+        muted2: 'var(--muted2)',
+        strong: 'var(--text-strong)',
+        strongest: 'var(--text-strongest)',
         ok: '#34c759',
         warn: '#f0b429',
         danger: '#e5484d',
       },
       borderColor: {
-        line: '#232a33',
+        line: 'var(--line)',
       },
       boxShadow: {
         // Flat uslub — og'ir soyalar olib tashlandi

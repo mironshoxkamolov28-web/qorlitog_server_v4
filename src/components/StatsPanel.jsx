@@ -4,7 +4,7 @@ import { normalizeSignalName } from '../utils/signalNames'
 // ПС/ПП, КП, ДСО/ПП — ikki holatli indikatorlar, "ochiq/band" ularga tegishli emas.
 const SIGNAL_KEYS = ['N1', 'N2', 'N4', 'N', 'Ч1', 'Ч2', 'Ч4', 'Ч']
 
-function StatCard({ label, value, hint, valueClass = 'text-white' }) {
+function StatCard({ label, value, hint, valueClass = 'text-strongest' }) {
   return (
     <article className="surface-card rounded-xl p-3.5">
       <span className="block uppercase tracking-[0.14em] text-[0.7rem] text-muted2">{label}</span>
@@ -30,11 +30,7 @@ export default function StatsPanel({ signalStates }) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="Umumiy yo'llar" value="8" hint="Asosiy yo'llar, shoxlar va yon yo'laklar" />
-        <StatCard
-          label="Umumiy svetoforlar"
-          value="14"
-          hint="8 asosiy + ПС/ПП, КП, ДСО/ПП indikatorlari (2 tomon)"
-        />
+        <StatCard label="Umumiy svetoforlar" value="8" hint="8 ta asosiy svetofor" />
         <StatCard
           label="Ochiq"
           value={greenCount}

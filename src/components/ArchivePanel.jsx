@@ -9,7 +9,7 @@ export default function ArchivePanel({ onShowArchive, onRealtime, archiveCount, 
   }, [selectedTime, onShowArchive])
 
   return (
-    <section className="surface-panel rounded-xl p-4 mt-3">
+    <div>
       <div className="flex justify-between items-end gap-2.5 mb-3.5 flex-wrap">
         <div>
           <p className="eyebrow">Arxiv bo'limi</p>
@@ -41,6 +41,6 @@ export default function ArchivePanel({ onShowArchive, onRealtime, archiveCount, 
           </button>
         </div>
       </div>
-    </section>
+    </div>
   )
 }
