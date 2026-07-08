@@ -77,7 +77,6 @@ export default function App() {
     }
     applySnapshot(snapshot)
     setArchiveMode(true)
-    setShowArchive(false)
   }, [archiveList, applySnapshot, setArchiveMode])
 
   const handleRealtime = useCallback(() => {
