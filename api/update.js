@@ -18,11 +18,16 @@ export default async function handler(req, res) {
   }
 
   const topDevice = data.device
-  const signalUpdates = new Map() // name -> row
+  const signalUpdates = new Map()  // name -> row (state o'zgarishi)
+  const voltageUpdates = new Map() // name -> row (faqat kuchlanish, state'ga tegmaydi)
   const rejected = []
 
   function apply(nm, st, device) {
     signalUpdates.set(nm, { name: nm, state: st, device: device || null, updated_at: new Date().toISOString() })
+  }
+
+  function applyVoltage(nm, voltage, device) {
+    voltageUpdates.set(nm, { name: nm, voltage, device: device || null, updated_at: new Date().toISOString() })
   }
 
   // 1) To'liq xarita: { signals: { "Ч1": "green", ... } } — heartbeat
@@ -57,15 +62,34 @@ export default async function handler(req, res) {
     }
   }
 
-  if (!signalUpdates.size) {
+  // 4) Kuchlanish xaritasi: { voltages: { "1СП": 218.4, "IП": 219.5 } } —
+  // 'state'ga tegmaydi, shuning uchun alohida (boshqa ustunlar bilan) upsert
+  // qilinadi — aks holda bitta so'rovda turli ustunli qatorlar aralashib ketardi.
+  if (data.voltages && typeof data.voltages === 'object') {
+    Object.entries(data.voltages).forEach(([k, v]) => {
+      const num = Number(v)
+      const nm = normalizeSignalName(k)
+      if (!Number.isFinite(num)) { rejected.push(`${nm}: "${v}" (kuchlanish)`); return }
+      applyVoltage(nm, num, topDevice)
+    })
+  }
+
+  if (!signalUpdates.size && !voltageUpdates.size) {
     res.status(400).json({ ok: false, error: "Hech narsa qabul qilinmadi", rejected, kelganKalitlar: Object.keys(data) })
     return
   }
 
-  // Bitta upsert — arxivga yozish (haqiqiy o'zgarganda) Postgres trigger orqali
-  // avtomatik bajariladi (supabase/schema.sql: log_signal_change).
-  const { error: upsertErr } = await supabase.from('signals').upsert([...signalUpdates.values()], { onConflict: 'name' })
-  if (upsertErr) { res.status(500).json({ ok: false, error: upsertErr.message }); return }
+  // Arxivga yozish (haqiqiy state o'zgarganda) Postgres trigger orqali
+  // avtomatik bajariladi (supabase/schema.sql: log_signal_change). Kuchlanish
+  // yangilanishi 'state'ga tegmagani uchun arxivni to'ldirmaydi.
+  if (signalUpdates.size) {
+    const { error } = await supabase.from('signals').upsert([...signalUpdates.values()], { onConflict: 'name' })
+    if (error) { res.status(500).json({ ok: false, error: error.message }); return }
+  }
+  if (voltageUpdates.size) {
+    const { error } = await supabase.from('signals').upsert([...voltageUpdates.values()], { onConflict: 'name' })
+    if (error) { res.status(500).json({ ok: false, error: error.message }); return }
+  }
 
-  res.status(200).json({ ok: true, count: signalUpdates.size, rejected })
+  res.status(200).json({ ok: true, count: signalUpdates.size + voltageUpdates.size, rejected })
 }

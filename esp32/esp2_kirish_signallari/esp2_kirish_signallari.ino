@@ -97,6 +97,70 @@ unsigned long changeStart[14] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 unsigned long lastHeartbeat = 0;
 
+// ===== ZMPT101B kuchlanish sensorlari (sinov: 1SП va IП seksiyalari) =====
+// GPIO 34/35 — INPUT-ONLY, ADC1 kanallari, digital signallar uchun
+// ishlatilmagani uchun bo'sh edi (yuqoridagi izohga qarang).
+const int PIN_VOLT_1SP = 34;
+const int PIN_VOLT_IP  = 35;
+
+// DIQQAT: bu koeffitsientlar hali kalibrlanmagan (1.0 — placeholder).
+// Kalibrlash: Serial Monitor'da "RAW RMS" qiymatini ko'ring, multimetr bilan
+// haqiqiy kuchlanishni o'lchang, keyin: koeffitsient = haqiqiyKuchlanish / RAW_RMS
+float VOLT_CAL_1SP = 1.0f;
+float VOLT_CAL_IP  = 1.0f;
+
+unsigned long lastVoltageSend = 0;
+
+// ZMPT101B'dan RMS (effektiv) qiymatni hisoblash: bir necha o'nlab
+// millisekund davomida (~50Hz'ning bir necha davri) o'qib, o'rtacha (bias)
+// atrofidagi tebranishning kvadrat o'rtachasi ildizini topadi.
+float readRawRms(int pin) {
+  const int samples = 400;
+  long sum = 0;
+  static int readings[samples];
+  for (int i = 0; i < samples; i++) {
+    readings[i] = analogRead(pin);
+    sum += readings[i];
+    delayMicroseconds(100);
+  }
+  float mean = (float)sum / samples;
+  double sumSq = 0;
+  for (int i = 0; i < samples; i++) {
+    double diff = readings[i] - mean;
+    sumSq += diff * diff;
+  }
+  return sqrt(sumSq / samples);
+}
+
+void sendVoltages() {
+  float raw1sp = readRawRms(PIN_VOLT_1SP);
+  float rawIp  = readRawRms(PIN_VOLT_IP);
+  float v1sp = raw1sp * VOLT_CAL_1SP;
+  float vIp  = rawIp  * VOLT_CAL_IP;
+
+  Serial.printf("Kuchlanish: 1SП RAW RMS=%.1f -> %.1fV | IП RAW RMS=%.1f -> %.1fV\n", raw1sp, v1sp, rawIp, vIp);
+
+  HTTPClient http;
+  char url[96];
+  snprintf(url, sizeof(url), "https://%s/api/update", SERVER_HOST);
+
+  http.begin(client, url);
+  http.addHeader("Content-Type", "application/json");
+
+  StaticJsonDocument<256> doc;
+  doc["device"] = DEVICE_ID;
+  JsonObject voltages = doc.createNestedObject("voltages");
+  voltages["1СП"] = v1sp;
+  voltages["IП"] = vIp;
+
+  String body;
+  serializeJson(doc, body);
+
+  int code = http.POST(body);
+  Serial.printf("Voltage update: %d\n", code);
+  http.end();
+}
+
 String getTimeStr() {
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
@@ -241,6 +305,10 @@ void setup() {
   client.setInsecure();
   telegramClient.setInsecure();
 
+  // ZMPT101B kirishlari to'liq 0-3.3V oralig'ini o'qishi uchun
+  analogSetPinAttenuation(PIN_VOLT_1SP, ADC_11db);
+  analogSetPinAttenuation(PIN_VOLT_IP, ADC_11db);
+
   for (int i = 0; i < 14; i++) {
     pinMode(pins[i], INPUT_PULLUP);
     lastState[i] = digitalRead(pins[i]);
@@ -283,6 +351,11 @@ void loop() {
   if (now - lastHeartbeat > 10000) {
     lastHeartbeat = now;
     sendHeartbeat();
+  }
+
+  if (now - lastVoltageSend > 3000) {
+    lastVoltageSend = now;
+    sendVoltages();
   }
 
   delay(50);

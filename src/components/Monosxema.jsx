@@ -99,7 +99,7 @@ function useAutoScale() {
   return { containerRef, scale }
 }
 
-export default function Monosxema({ signalStates, isArchiveMode }) {
+export default function Monosxema({ signalStates, voltageStates, isArchiveMode }) {
   const { containerRef, scale } = useAutoScale()
 
   const getState = (name) => {
@@ -108,6 +108,13 @@ export default function Monosxema({ signalStates, isArchiveMode }) {
   }
 
   const isFree = (name) => getState(name) === 'green'
+
+  // Rels zanjiri kuchlanishi (ZMPT101B) — hozircha faqat sensor ulangan
+  // seksiyalar uchun keladi, boshqalarida umuman ko'rsatilmaydi.
+  const getVoltage = (name) => {
+    const v = (voltageStates || {})[normalizeSignalName(name)]
+    return typeof v === 'number' ? v : null
+  }
 
   const trackState = (t) => {
     if (t.sw) {
@@ -193,15 +200,26 @@ export default function Monosxema({ signalStates, isArchiveMode }) {
             {isArchiveMode ? 'Arxiv' : 'Live'}
           </div>
 
-          {SECTIONS.map((sec, i) => (
-            <span
-              key={`sec-${i}`}
-              className={`section ${isFree(sec.name) ? 'free' : 'busy'}`}
-              style={{ left: sec.left, top: sec.top }}
-            >
-              {sec.label}
-            </span>
-          ))}
+          {SECTIONS.map((sec, i) => {
+            // Faqat "to'liq nom" yorlig'ida ko'rsatiladi (masalan '1СП'), qisqa
+            // raqamli sub-yorliqlarda ('1', '3', '5'...) takrorlanmasin.
+            const voltage = sec.label === sec.name ? getVoltage(sec.name) : null
+            return (
+              <span key={`sec-${i}`}>
+                <span
+                  className={`section ${isFree(sec.name) ? 'free' : 'busy'}`}
+                  style={{ left: sec.left, top: sec.top }}
+                >
+                  {sec.label}
+                </span>
+                {voltage !== null && (
+                  <span className="voltage-label" style={{ left: sec.left, top: sec.top + 28 }}>
+                    {voltage.toFixed(1)}V
+                  </span>
+                )}
+              </span>
+            )
+          })}
         </div>
       </div>
     </section>

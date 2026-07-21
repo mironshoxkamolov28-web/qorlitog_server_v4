@@ -50,17 +50,20 @@ function computeSnapshotAt(targetDate, archiveList) {
 export default function App() {
   const {
     signalStates,
+    voltageStates,
     archiveList,
     setArchiveList,
     isArchiveMode,
     setArchiveMode,
     resetToRealtime,
     applySignalData,
+    applyVoltageData,
     applySnapshot
   } = useSignalState()
 
   const { connStatus, loadStatus, fetchError, devices } = useLiveData({
     applySignalData,
+    applyVoltageData,
     setArchiveList,
     isArchiveMode
   })
@@ -108,7 +111,7 @@ export default function App() {
         onOpenArchive={() => setShowArchive(true)}
         onOpenStats={() => setShowStats(true)}
       />
-      <Monosxema signalStates={signalStates} isArchiveMode={isArchiveMode} />
+      <Monosxema signalStates={signalStates} voltageStates={voltageStates} isArchiveMode={isArchiveMode} />
       <StatsPanel signalStates={signalStates} />
 
       {showArchive && (

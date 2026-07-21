@@ -3,10 +3,15 @@
 
 create table if not exists signals (
   name       text primary key,
-  state      text not null check (state in ('green', 'red')),
+  state      text not null default 'red' check (state in ('green', 'red')),
   device     text,
+  voltage    numeric,
   updated_at timestamptz not null default now()
 );
+
+-- Eski bazalarda ustun bo'lmasa qo'shib qo'yadi (yangi o'rnatishda no-op)
+alter table signals add column if not exists voltage numeric;
+alter table signals alter column state set default 'red';
 
 create table if not exists archive (
   id         bigint generated always as identity primary key,

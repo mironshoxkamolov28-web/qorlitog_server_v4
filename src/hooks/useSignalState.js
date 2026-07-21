@@ -19,6 +19,7 @@ const INITIAL_STATES = normalizeSignalMap(RAW_INITIAL_STATES)
 
 export function useSignalState() {
   const [signalStates, setSignalStates] = useState(INITIAL_STATES)
+  const [voltageStates, setVoltageStates] = useState({})
   const [archiveList, setArchiveList] = useState([])
   const [isArchiveMode, setIsArchiveMode] = useState(false)
 
@@ -27,6 +28,20 @@ export function useSignalState() {
     setSignalStates(prev => {
       const next = { ...prev }
       Object.entries(signals).forEach(([k, v]) => {
+        next[normalizeSignalName(k)] = v
+      })
+      return next
+    })
+  }, [])
+
+  // Rels zanjiri kuchlanishi (ZMPT101B) — state (ochiq/band)dan mustaqil,
+  // faqat sonli qiymat. Hozircha faqat sensor ulangan seksiyalar uchun keladi.
+  const applyVoltageData = useCallback((voltages) => {
+    if (!voltages) return
+    setVoltageStates(prev => {
+      const next = { ...prev }
+      Object.entries(voltages).forEach(([k, v]) => {
+        if (v === null || v === undefined) return
         next[normalizeSignalName(k)] = v
       })
       return next
@@ -56,12 +71,14 @@ export function useSignalState() {
 
   return {
     signalStates,
+    voltageStates,
     archiveList,
     setArchiveList,
     isArchiveMode,
     setArchiveMode,
     resetToRealtime,
     applySignalData,
+    applyVoltageData,
     applySnapshot
   }
 }
