@@ -3,13 +3,13 @@ import { normalizeSignalName } from '../utils/signalNames'
 
 const TRACKS = [
   { name: '1ЧП',   left: 10,   top: 140,  w: 230, bg: 'rgb(216,204,204)', rot: '' },
-  { name: '2СП',   left: 250,  top: 140,  w: 350, bg: 'rgb(177,163,163)', rot: '', sw: '2', pathType: 'straight' },
+  { name: '2СП',   left: 250,  top: 140,  w: 350, bg: 'rgb(177,163,163)', rot: '', sw: '2', pathType: 'straight', switchAt: 470 },
   { name: 'IП',    left: 610,  top: 140,  w: 620, bg: 'rgb(177,163,163)', rot: '' },
-  { name: '1СП',   left: 1240, top: 140,  w: 260, bg: 'rgb(177,163,163)', rot: '', sw: '1', pathType: 'straight' },
+  { name: '1СП',   left: 1240, top: 140,  w: 260, bg: 'rgb(177,163,163)', rot: '', sw: '1', pathType: 'straight', switchAt: 1367 },
   { name: '1НП',   left: 1510, top: 140,  w: 290, bg: 'rgb(177,163,163)', rot: '' },
-  { name: '4-6СП', left: 500, top: 260,  w: 260, bg: '', rot: '', sw: '4-6', pathType: 'straight' },
+  { name: '4-6СП', left: 500, top: 260,  w: 260, bg: '', rot: '', sw: '4-6', pathType: 'straight', switchAt: 680 },
   { name: 'IIП',   left: 770,  top: 260,  w: 320, bg: '', rot: '' },
-  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '', sw: '3-5', pathType: 'straight' },
+  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '', sw: '3-5', pathType: 'straight', switchAt: 1250 },
   { name: 'IVП',   left: 801,  top: 380,  w: 249, bg: '', rot: '' },
   { name: '2СП',   left: 470,  top: 140,  w: 90,  bg: 'rgb(177,163,163)', rot: '45deg', sw: '2', pathType: 'side' },
   { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '4-6', pathType: 'side' },
@@ -134,21 +134,47 @@ export default function Monosxema({ signalStates, isArchiveMode }) {
           <h3 className="absolute left-[140px] top-5 font-bold text-[1rem] text-muted">Buxoro tomoni</h3>
           <h3 className="absolute right-[240px] top-5 font-bold text-[1rem] text-muted">Miskent tomoni</h3>
 
-          {TRACKS.map((t, i) => (
-            <div
-              key={`track-${i}`}
-              className={`track ${trackState(t)}`}
-              style={{
-                left: t.left,
-                top: t.top,
-                width: t.w,
-                transform: t.rot ? `rotate(${t.rot})` : undefined
-                /* Eslatma: inline backgroundColor olib tashlandi — inline stil
-                   .free/.busy klass ranglaridan har doim ustun bo'lib,
-                   yo'l rangi holatga qarab o'zgarmay qolardi. */
-              }}
-            />
-          ))}
+          {TRACKS.flatMap((t, i) => {
+            /* Strelkali to'g'ri yo'nalish — ikkiga bo'lib chiziladi:
+               1) strelkagacha bo'lgan umumiy qism — ikkala yo'nalish ham shu
+                  orqali o'tadi, shuning uchun strelka holatidan qat'i nazar
+                  har doim yonib turadi;
+               2) strelkadan keyingi qism — faqat strelka to'g'riga (ПК/+)
+                  qo'yilganda yonadi, aks holda shtrix. */
+            if (t.pathType === 'straight' && t.switchAt != null) {
+              const pk = getState(t.sw + 'ПК') === 'green'
+              const color = isFree(t.name) ? 'free' : 'busy'
+              const sharedW = t.switchAt - t.left
+              const afterW = t.left + t.w - t.switchAt
+              return [
+                <div
+                  key={`track-${i}-shared`}
+                  className={`track ${color}`}
+                  style={{ left: t.left, top: t.top, width: sharedW, borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+                />,
+                <div
+                  key={`track-${i}-after`}
+                  className={`track ${pk ? color : color + ' dashed'}`}
+                  style={{ left: t.switchAt, top: t.top, width: afterW, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                />
+              ]
+            }
+            return [
+              <div
+                key={`track-${i}`}
+                className={`track ${trackState(t)}`}
+                style={{
+                  left: t.left,
+                  top: t.top,
+                  width: t.w,
+                  transform: t.rot ? `rotate(${t.rot})` : undefined
+                  /* Eslatma: inline backgroundColor olib tashlandi — inline stil
+                     .free/.busy klass ranglaridan har doim ustun bo'lib,
+                     yo'l rangi holatga qarab o'zgarmay qolardi. */
+                }}
+              />
+            ]
+          })}
 
           {SIGNALS.map((s, i) => (
             <div key={`sig-${i}`}>
