@@ -5,3 +5,4 @@ dist/
 archive.json
 *.log
 esp32/**/secrets.h
+.claude/
