@@ -60,20 +60,24 @@ const int PIN_PS_PP_N = 5;      // ПС/ПП_N
 const int PIN_KP_N    = 16;     // КП_N
 const int PIN_DSO_PP_N = 17;    // ДСО/ПП_N
 
-// Strelka indikatorlari
-const int PIN_2PK    = 25;    // 2ПК
-const int PIN_2MK    = 26;    // 2МК
-const int PIN_46PK   = 27;    // 4-6ПК
-const int PIN_46MK   = 14;    // 4-6МК
+// Strelka indikatorlari — pinlar o'zgarmadi, faqat nomlar strelkalarning
+// haqiqiy guruhlanishiga mos yangilandi: 2 va 4 spaeng (sinxron, bitta
+// sensor — shu pin), 6 mustaqil (bu pin avval "4-6" deb nomlangan edi),
+// 3 demontaj qilingan (sensori yo'q), 5 mustaqil (avval "3-5" deb
+// nomlangan edi).
+const int PIN_2PK    = 25;    // 2-4ПК
+const int PIN_2MK    = 26;    // 2-4МК
+const int PIN_46PK   = 27;    // 6ПК
+const int PIN_46MK   = 14;    // 6МК
 const int PIN_1PK    = 12;    // 1ПК
 const int PIN_1MK    = 13;    // 1МК
-const int PIN_35PK   = 15;    // 3-5ПК
-const int PIN_35MK   = 4;     // 3-5МК
+const int PIN_35PK   = 15;    // 5ПК
+const int PIN_35MK   = 4;     // 5МК
 
 // Signal nomlari (serverga yuborish uchun)
 const char* names[14] = {
   "ПС/ПП_Ч", "КП_Ч", "ДСО/ПП_Ч", "ПС/ПП_N", "КП_N", "ДСО/ПП_N",
-  "2ПК", "2МК", "4-6ПК", "4-6МК", "1ПК", "1МК", "3-5ПК", "3-5МК"
+  "2-4ПК", "2-4МК", "6ПК", "6МК", "1ПК", "1МК", "5ПК", "5МК"
 };
 
 // Pin raqamlari

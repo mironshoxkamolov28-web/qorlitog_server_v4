@@ -11,8 +11,8 @@ const RAW_INITIAL_STATES = {
   '4-6СП': 'red', '1ЧП': 'red', 'IП': 'red', 'IIП': 'red', 'IVП': 'red',
   'ПС/ПП_Ч': 'red', 'КП_Ч': 'red', 'ДСО/ПП_Ч': 'red',
   'ПС/ПП_N': 'red', 'КП_N': 'red', 'ДСО/ПП_N': 'red',
-  '1ПК': 'red', '1МК': 'red', '2ПК': 'red', '2МК': 'red',
-  '3-5ПК': 'red', '3-5МК': 'red', '4-6ПК': 'red', '4-6МК': 'red'
+  '1ПК': 'red', '1МК': 'red', '2-4ПК': 'red', '2-4МК': 'red',
+  '5ПК': 'red', '5МК': 'red', '6ПК': 'red', '6МК': 'red'
 }
 
 const INITIAL_STATES = normalizeSignalMap(RAW_INITIAL_STATES)
