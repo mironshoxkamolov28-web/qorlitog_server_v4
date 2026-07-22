@@ -103,11 +103,12 @@ unsigned long lastHeartbeat = 0;
 const int PIN_VOLT_1SP = 34;
 const int PIN_VOLT_IP  = 35;
 
-// DIQQAT: bu koeffitsientlar hali kalibrlanmagan (1.0 — placeholder).
 // Kalibrlash: Serial Monitor'da "RAW RMS" qiymatini ko'ring, multimetr bilan
 // haqiqiy kuchlanishni o'lchang, keyin: koeffitsient = haqiqiyKuchlanish / RAW_RMS
-float VOLT_CAL_1SP = 1.0f;
-float VOLT_CAL_IP  = 1.0f;
+float VOLT_CAL_1SP = 1.0f;  // hali kalibrlanmagan — 1СП hali sinalmagan
+
+// IП uchun kalibrlangan (2 o'lchov: 10V/RAW18.8, 13.5V/RAW23.5 -> o'rtacha nisbat)
+float VOLT_CAL_IP  = 0.553f;
 
 unsigned long lastVoltageSend = 0;
 
