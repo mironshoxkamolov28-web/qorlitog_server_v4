@@ -16,7 +16,7 @@ const DEVICE_OFFLINE_MS = 25000
 // tasodifiy device nomlari (masalan debug skriptlaridan) chiqmasligi uchun.
 const KNOWN_DEVICE_RE = /^esp32-\d+$/
 
-export default function HeroBar({ connStatus, devices, theme, onToggleTheme, onOpenArchive, onOpenStats }) {
+export default function HeroBar({ connStatus, devices, theme, onToggleTheme, onOpenArchive, onOpenStats, onOpenRailVoltage }) {
   const [clock, setClock] = useState('--:--:--')
 
   useEffect(() => {
@@ -51,6 +51,9 @@ export default function HeroBar({ connStatus, devices, theme, onToggleTheme, onO
           )
         })}
         <span className="chip font-mono">{clock}</span>
+        <button type="button" onClick={onOpenRailVoltage} className="btn">
+          Rels zanjirlari kuchlanishi
+        </button>
         <button type="button" onClick={onOpenStats} className="btn">
           Statistika
         </button>

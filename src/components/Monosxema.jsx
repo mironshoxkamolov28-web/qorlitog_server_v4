@@ -99,7 +99,7 @@ function useAutoScale() {
   return { containerRef, scale }
 }
 
-export default function Monosxema({ signalStates, voltageStates, isArchiveMode }) {
+export default function Monosxema({ signalStates, isArchiveMode }) {
   const { containerRef, scale } = useAutoScale()
 
   const getState = (name) => {
@@ -204,23 +204,6 @@ export default function Monosxema({ signalStates, voltageStates, isArchiveMode }
           ))}
         </div>
       </div>
-
-      {Object.keys(voltageStates || {}).length > 0 && (
-        <div className="mt-3 pt-3 border-t border-line">
-          <p className="eyebrow mb-2">Rels zanjiri kuchlanishi</p>
-          <div className="flex gap-2 flex-wrap">
-            {Object.entries(voltageStates).map(([name, info]) => (
-              <span key={name} className="chip font-mono">
-                <strong className="font-sans font-bold not-italic mr-1">{name}</strong>
-                {info.value.toFixed(1)}V
-                <span className="text-muted2 ml-1">
-                  · {info.updatedAt ? new Date(info.updatedAt).toLocaleTimeString('uz-UZ') : '—'}
-                </span>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
     </section>
   )
 }

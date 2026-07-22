@@ -24,19 +24,37 @@ create table if not exists archive (
 
 create index if not exists archive_ts_idx on archive (ts desc);
 
--- Realtime: signals va archive jadvalidagi o'zgarishlar frontendga jonli yuborilishi uchun
+-- Rels zanjiri kuchlanishi: har bir seksiya uchun 2 ta ZMPT101B (quvvat
+-- tomoni + rele tomoni), 3 ta alohida ESP32 (esp32-3, esp32-4, esp32-5)
+-- orqali yuboriladi. 'signals' jadvalidagi 'voltage' ustunidan farqli —
+-- bu butunlay alohida qurilmalar va seksiyalarning to'liq ro'yxati uchun.
+create table if not exists rail_voltages (
+  name           text primary key,
+  power_voltage  numeric,
+  relay_voltage  numeric,
+  device         text,
+  updated_at     timestamptz not null default now()
+);
+
+-- Realtime: signals, archive va rail_voltages jadvalidagi o'zgarishlar
+-- frontendga jonli yuborilishi uchun
 alter publication supabase_realtime add table signals;
 alter publication supabase_realtime add table archive;
+alter publication supabase_realtime add table rail_voltages;
 
 -- RLS: brauzer (anon key) faqat o'qiy oladi; yozish faqat service_role
 -- (Vercel serverless funksiyasi) orqali, u RLS'ni chetlab o'tadi.
 alter table signals enable row level security;
 alter table archive enable row level security;
+alter table rail_voltages enable row level security;
 
 create policy "signals_public_read" on signals
   for select using (true);
 
 create policy "archive_public_read" on archive
+  for select using (true);
+
+create policy "rail_voltages_public_read" on rail_voltages
   for select using (true);
 
 -- Arxivga yozishni Postgres'ning o'ziga topshirish: avval Vercel funksiyasi

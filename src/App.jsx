@@ -15,6 +15,7 @@ import StatsPanel from './components/StatsPanel'
 import ArchivePanel from './components/ArchivePanel'
 import ArchiveTable from './components/ArchiveTable'
 import SignalStatsModal from './components/SignalStatsModal'
+import RailVoltageModal from './components/RailVoltageModal'
 import Modal from './components/Modal'
 
 // Arxiv yozuvining vaqtini olish.
@@ -50,20 +51,17 @@ function computeSnapshotAt(targetDate, archiveList) {
 export default function App() {
   const {
     signalStates,
-    voltageStates,
     archiveList,
     setArchiveList,
     isArchiveMode,
     setArchiveMode,
     resetToRealtime,
     applySignalData,
-    applyVoltageData,
     applySnapshot
   } = useSignalState()
 
   const { connStatus, loadStatus, fetchError, devices } = useLiveData({
     applySignalData,
-    applyVoltageData,
     setArchiveList,
     isArchiveMode
   })
@@ -71,6 +69,7 @@ export default function App() {
   const { theme, toggleTheme } = useTheme()
   const [showArchive, setShowArchive] = useState(false)
   const [showStats, setShowStats] = useState(false)
+  const [showRailVoltage, setShowRailVoltage] = useState(false)
 
   const handleShowArchive = useCallback((targetDate) => {
     const snapshot = computeSnapshotAt(targetDate, archiveList)
@@ -110,8 +109,9 @@ export default function App() {
         onToggleTheme={toggleTheme}
         onOpenArchive={() => setShowArchive(true)}
         onOpenStats={() => setShowStats(true)}
+        onOpenRailVoltage={() => setShowRailVoltage(true)}
       />
-      <Monosxema signalStates={signalStates} voltageStates={voltageStates} isArchiveMode={isArchiveMode} />
+      <Monosxema signalStates={signalStates} isArchiveMode={isArchiveMode} />
       <StatsPanel signalStates={signalStates} />
 
       {showArchive && (
@@ -135,6 +135,12 @@ export default function App() {
       {showStats && (
         <Modal title="24 soatlik statistika" onClose={() => setShowStats(false)}>
           <SignalStatsModal archiveList={archiveList} />
+        </Modal>
+      )}
+
+      {showRailVoltage && (
+        <Modal title="Rels zanjirlari kuchlanishi" onClose={() => setShowRailVoltage(false)}>
+          <RailVoltageModal />
         </Modal>
       )}
     </main>

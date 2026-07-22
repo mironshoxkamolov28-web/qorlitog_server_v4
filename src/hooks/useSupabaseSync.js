@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 
 const ARCHIVE_QUERY_LIMIT = 2000
 
-export function useSupabaseSync({ applySignalData, applyVoltageData, setArchiveList, isArchiveMode }) {
+export function useSupabaseSync({ applySignalData, setArchiveList, isArchiveMode }) {
   const [connStatus, setConnStatus] = useState('connecting')
   const [fetchError, setFetchError] = useState(null)
   const [devices, setDevices] = useState({})
@@ -28,15 +28,6 @@ export function useSupabaseSync({ applySignalData, applyVoltageData, setArchiveL
     if (force || !archiveModeRef.current) {
       applySignalData(Object.fromEntries((signalRows || []).map(r => [r.name, r.state])))
     }
-    if (applyVoltageData) {
-      const voltageMap = {}
-      ;(signalRows || []).forEach(r => {
-        if (r.voltage !== null && r.voltage !== undefined) {
-          voltageMap[r.name] = { value: r.voltage, updatedAt: r.updated_at }
-        }
-      })
-      applyVoltageData(voltageMap)
-    }
 
     const { data: archiveRows, error: aErr } = await supabase
       .from('archive')
@@ -46,7 +37,7 @@ export function useSupabaseSync({ applySignalData, applyVoltageData, setArchiveL
     if (aErr) { setFetchError(aErr.message); return }
     setArchiveList(archiveRows || [])
     setFetchError(null)
-  }, [applySignalData, applyVoltageData, setArchiveList, touchDevice])
+  }, [applySignalData, setArchiveList, touchDevice])
 
   useEffect(() => {
     loadStatus()
@@ -59,9 +50,6 @@ export function useSupabaseSync({ applySignalData, applyVoltageData, setArchiveL
         touchDevice(row.device, row.updated_at)
         if (!archiveModeRef.current) {
           applySignalData({ [row.name]: row.state })
-        }
-        if (applyVoltageData && row.voltage !== null && row.voltage !== undefined) {
-          applyVoltageData({ [row.name]: { value: row.voltage, updatedAt: row.updated_at } })
         }
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'archive' }, (payload) => {
