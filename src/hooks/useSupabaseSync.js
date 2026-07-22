@@ -30,7 +30,11 @@ export function useSupabaseSync({ applySignalData, applyVoltageData, setArchiveL
     }
     if (applyVoltageData) {
       const voltageMap = {}
-      ;(signalRows || []).forEach(r => { if (r.voltage !== null && r.voltage !== undefined) voltageMap[r.name] = r.voltage })
+      ;(signalRows || []).forEach(r => {
+        if (r.voltage !== null && r.voltage !== undefined) {
+          voltageMap[r.name] = { value: r.voltage, updatedAt: r.updated_at }
+        }
+      })
       applyVoltageData(voltageMap)
     }
 
@@ -57,7 +61,7 @@ export function useSupabaseSync({ applySignalData, applyVoltageData, setArchiveL
           applySignalData({ [row.name]: row.state })
         }
         if (applyVoltageData && row.voltage !== null && row.voltage !== undefined) {
-          applyVoltageData({ [row.name]: row.voltage })
+          applyVoltageData({ [row.name]: { value: row.voltage, updatedAt: row.updated_at } })
         }
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'archive' }, (payload) => {

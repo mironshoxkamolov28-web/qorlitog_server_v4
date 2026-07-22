@@ -282,20 +282,6 @@
     color: var(--muted);
     z-index: 6;
   }
-  /* --- Rels zanjiri kuchlanishi (ZMPT101B) --- */
-  .voltage-label {
-    position: absolute;
-    font-size: 15px;
-    font-weight: 600;
-    font-family: ui-monospace, SFMono-Regular, Consolas, Menlo, monospace;
-    color: var(--warn);
-    background: var(--ink-850);
-    border: 1px solid var(--edge);
-    border-radius: 6px;
-    padding: 1px 6px;
-    z-index: 6;
-    white-space: nowrap;
-  }
   /* --- Live / Arxiv markeri --- */
   .archive-marker {
     position: absolute;

@@ -109,13 +109,6 @@ export default function Monosxema({ signalStates, voltageStates, isArchiveMode }
 
   const isFree = (name) => getState(name) === 'green'
 
-  // Rels zanjiri kuchlanishi (ZMPT101B) — hozircha faqat sensor ulangan
-  // seksiyalar uchun keladi, boshqalarida umuman ko'rsatilmaydi.
-  const getVoltage = (name) => {
-    const v = (voltageStates || {})[normalizeSignalName(name)]
-    return typeof v === 'number' ? v : null
-  }
-
   const trackState = (t) => {
     if (t.sw) {
       const pk = getState(t.sw + 'ПК') === 'green'
@@ -200,28 +193,34 @@ export default function Monosxema({ signalStates, voltageStates, isArchiveMode }
             {isArchiveMode ? 'Arxiv' : 'Live'}
           </div>
 
-          {SECTIONS.map((sec, i) => {
-            // Faqat "to'liq nom" yorlig'ida ko'rsatiladi (masalan '1СП'), qisqa
-            // raqamli sub-yorliqlarda ('1', '3', '5'...) takrorlanmasin.
-            const voltage = sec.label === sec.name ? getVoltage(sec.name) : null
-            return (
-              <span key={`sec-${i}`}>
-                <span
-                  className={`section ${isFree(sec.name) ? 'free' : 'busy'}`}
-                  style={{ left: sec.left, top: sec.top }}
-                >
-                  {sec.label}
-                </span>
-                {voltage !== null && (
-                  <span className="voltage-label" style={{ left: sec.left, top: sec.top + 28 }}>
-                    {voltage.toFixed(1)}V
-                  </span>
-                )}
-              </span>
-            )
-          })}
+          {SECTIONS.map((sec, i) => (
+            <span
+              key={`sec-${i}`}
+              className={`section ${isFree(sec.name) ? 'free' : 'busy'}`}
+              style={{ left: sec.left, top: sec.top }}
+            >
+              {sec.label}
+            </span>
+          ))}
         </div>
       </div>
+
+      {Object.keys(voltageStates || {}).length > 0 && (
+        <div className="mt-3 pt-3 border-t border-line">
+          <p className="eyebrow mb-2">Rels zanjiri kuchlanishi</p>
+          <div className="flex gap-2 flex-wrap">
+            {Object.entries(voltageStates).map(([name, info]) => (
+              <span key={name} className="chip font-mono">
+                <strong className="font-sans font-bold not-italic mr-1">{name}</strong>
+                {info.value.toFixed(1)}V
+                <span className="text-muted2 ml-1">
+                  · {info.updatedAt ? new Date(info.updatedAt).toLocaleTimeString('uz-UZ') : '—'}
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   )
 }

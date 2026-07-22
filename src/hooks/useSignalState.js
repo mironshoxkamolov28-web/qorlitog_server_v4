@@ -34,14 +34,16 @@ export function useSignalState() {
     })
   }, [])
 
-  // Rels zanjiri kuchlanishi (ZMPT101B) — state (ochiq/band)dan mustaqil,
-  // faqat sonli qiymat. Hozircha faqat sensor ulangan seksiyalar uchun keladi.
+  // Rels zanjiri kuchlanishi (ZMPT101B) — state (ochiq/band)dan mustaqil.
+  // Har bir yozuv { value, updatedAt } ko'rinishida — pastdagi alohida
+  // qatorda vaqtini ham ko'rsatish uchun. Hozircha faqat sensor ulangan
+  // seksiyalar uchun keladi.
   const applyVoltageData = useCallback((voltages) => {
     if (!voltages) return
     setVoltageStates(prev => {
       const next = { ...prev }
       Object.entries(voltages).forEach(([k, v]) => {
-        if (v === null || v === undefined) return
+        if (!v || v.value === null || v.value === undefined) return
         next[normalizeSignalName(k)] = v
       })
       return next
