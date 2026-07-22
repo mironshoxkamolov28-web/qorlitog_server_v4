@@ -10,16 +10,14 @@ const TRACKS = [
   // 4-6СП qatorida ikkita strelka nuqtasi bor: 4 (2 bilan spaeng) va 6 (mustaqil)
   { name: '4-6СП', left: 500, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 538, sw: '2-4' }, { at: 680, sw: '6' }] },
   { name: 'IIП',   left: 770,  top: 260,  w: 320, bg: '', rot: '' },
-  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '' },
+  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 1250, sw: '5' }] },
   { name: 'IVП',   left: 801,  top: 380,  w: 249, bg: '', rot: '' },
   { name: '2СП',   left: 470,  top: 140,  w: 90,  bg: 'rgb(177,163,163)', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '6', pathType: 'side' },
   { name: '4-6СП', left: 538, top: 213,  w: 65,  bg: '', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '1СП',   left: 1310, top: 200,  w: 80,  bg: 'rgb(177,163,163)', rot: '-45deg', sw: '1', pathType: 'side' },
-  // Strelka 3 demontaj qilingan — uning tupik (o'chirilgan) yo'l bo'lagi olib tashlandi.
-  // Strelka 5'ning diagonal shtrix qismi ham kerak emas edi (1'ning
-  // diagonali bilan chalkash tutashib ko'rinardi) — 3-5СП endi oddiy
-  // to'g'ri qator, hech qanday strelka tarmog'i chizilmaydi.
+  { name: '3-5СП', left: 1250, top: 260,  w: 80,  bg: '', rot: '-45deg', sw: '5', pathType: 'side' },
+  // Strelka 3 demontaj qilingan — uning tupik (o'chirilgan) yo'l bo'lagi olib tashlandi
   { name: 'IVП',   left: 1050, top: 380,  w: 75,  bg: '', rot: '-45deg' },
   { name: 'IVП',   left: 802,  top: 380,  w: 95,  bg: '', rot: '-135deg' },
 ]
