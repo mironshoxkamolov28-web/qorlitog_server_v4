@@ -95,18 +95,25 @@ alter table rail_voltages enable row level security;
 alter table rail_voltage_limits enable row level security;
 alter table rail_voltage_archive enable row level security;
 
+-- Har birida avval "drop policy if exists" — fayl qayta ishga tushirilsa
+-- ("policy allaqachon mavjud" xatosisiz) xavfsiz bo'lishi uchun.
+drop policy if exists "signals_public_read" on signals;
 create policy "signals_public_read" on signals
   for select using (true);
 
+drop policy if exists "archive_public_read" on archive;
 create policy "archive_public_read" on archive
   for select using (true);
 
+drop policy if exists "rail_voltages_public_read" on rail_voltages;
 create policy "rail_voltages_public_read" on rail_voltages
   for select using (true);
 
+drop policy if exists "rail_voltage_limits_public_read" on rail_voltage_limits;
 create policy "rail_voltage_limits_public_read" on rail_voltage_limits
   for select using (true);
 
+drop policy if exists "rail_voltage_archive_public_read" on rail_voltage_archive;
 create policy "rail_voltage_archive_public_read" on rail_voltage_archive
   for select using (true);
 
