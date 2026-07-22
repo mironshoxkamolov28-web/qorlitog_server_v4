@@ -3,20 +3,21 @@ import { normalizeSignalName } from '../utils/signalNames'
 
 const TRACKS = [
   { name: '1ЧП',   left: 10,   top: 140,  w: 230, bg: 'rgb(216,204,204)', rot: '' },
-  { name: '2СП',   left: 250,  top: 140,  w: 350, bg: 'rgb(177,163,163)', rot: '', sw: '2', pathType: 'straight', switchAt: 470 },
+  { name: '2СП',   left: 250,  top: 140,  w: 350, bg: 'rgb(177,163,163)', rot: '', switchPoints: [{ at: 470, sw: '2-4' }] },
   { name: 'IП',    left: 610,  top: 140,  w: 620, bg: 'rgb(177,163,163)', rot: '' },
-  { name: '1СП',   left: 1240, top: 140,  w: 260, bg: 'rgb(177,163,163)', rot: '', sw: '1', pathType: 'straight', switchAt: 1367 },
+  { name: '1СП',   left: 1240, top: 140,  w: 260, bg: 'rgb(177,163,163)', rot: '', switchPoints: [{ at: 1367, sw: '1' }] },
   { name: '1НП',   left: 1510, top: 140,  w: 290, bg: 'rgb(177,163,163)', rot: '' },
-  { name: '4-6СП', left: 500, top: 260,  w: 260, bg: '', rot: '', sw: '4-6', pathType: 'straight', switchAt: 680 },
+  // 4-6СП qatorida ikkita strelka nuqtasi bor: 4 (2 bilan spaeng) va 6 (mustaqil)
+  { name: '4-6СП', left: 500, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 538, sw: '2-4' }, { at: 680, sw: '6' }] },
   { name: 'IIП',   left: 770,  top: 260,  w: 320, bg: '', rot: '' },
-  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '', sw: '3-5', pathType: 'straight', switchAt: 1250 },
+  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 1250, sw: '5' }] },
   { name: 'IVП',   left: 801,  top: 380,  w: 249, bg: '', rot: '' },
-  { name: '2СП',   left: 470,  top: 140,  w: 90,  bg: 'rgb(177,163,163)', rot: '45deg', sw: '2', pathType: 'side' },
-  { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '4-6', pathType: 'side' },
-  { name: '4-6СП', left: 538, top: 213,  w: 65,  bg: '', rot: '45deg', sw: '4-6', pathType: 'side' },
+  { name: '2СП',   left: 470,  top: 140,  w: 90,  bg: 'rgb(177,163,163)', rot: '45deg', sw: '2-4', pathType: 'side' },
+  { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '6', pathType: 'side' },
+  { name: '4-6СП', left: 538, top: 213,  w: 65,  bg: '', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '1СП',   left: 1310, top: 200,  w: 80,  bg: 'rgb(177,163,163)', rot: '-45deg', sw: '1', pathType: 'side' },
-  { name: '3-5СП', left: 1250, top: 260,  w: 80,  bg: '', rot: '-45deg', sw: '3-5', pathType: 'side' },
-  { name: '3-5СП', left: 1110, top: 320,  w: 80,  bg: '', rot: '-45deg', sw: '3-5', pathType: 'side' },
+  { name: '3-5СП', left: 1250, top: 260,  w: 80,  bg: '', rot: '-45deg', sw: '5', pathType: 'side' },
+  // Strelka 3 demontaj qilingan — uning tupik (o'chirilgan) yo'l bo'lagi olib tashlandi
   { name: 'IVП',   left: 1050, top: 380,  w: 75,  bg: '', rot: '-45deg' },
   { name: 'IVП',   left: 802,  top: 380,  w: 95,  bg: '', rot: '-135deg' },
 ]
@@ -39,23 +40,23 @@ const SIGNALS = [
 ]
 
 const SWITCHES = [
-  // Chap tomon eng burchagi (Buxoro) — 2 va 4-6 strelkalar
-  { name: '2ПК',  display: '+',  colorType: 'green',  sigLeft: 20,  sigTop: 470,  labelLeft: 25,  labelTop: 450 },
-  { name: '2МК',  display: '-',  colorType: 'yellow', sigLeft: 70,  sigTop: 470,  labelLeft: 75,  labelTop: 450 },
-  { name: '4-6ПК', display: '+',  colorType: 'green',  sigLeft: 160, sigTop: 470,  labelLeft: 165, labelTop: 450 },
-  { name: '4-6МК', display: '-',  colorType: 'yellow', sigLeft: 210, sigTop: 470,  labelLeft: 215, labelTop: 450 },
-  // O'ng tomon eng burchagi (Miskent) — 1 va 3-5 strelkalar
+  // Chap tomon (Buxoro) — 2 va 4 spaeng (sinxron) ishlaydi, 6 mustaqil
+  { name: '2-4ПК', display: '+',  colorType: 'green',  sigLeft: 20,  sigTop: 470,  labelLeft: 25,  labelTop: 450 },
+  { name: '2-4МК', display: '-',  colorType: 'yellow', sigLeft: 70,  sigTop: 470,  labelLeft: 75,  labelTop: 450 },
+  { name: '6ПК',   display: '+',  colorType: 'green',  sigLeft: 160, sigTop: 470,  labelLeft: 165, labelTop: 450 },
+  { name: '6МК',   display: '-',  colorType: 'yellow', sigLeft: 210, sigTop: 470,  labelLeft: 215, labelTop: 450 },
+  // O'ng tomon (Miskent) — 1 mustaqil; 3 demontaj qilingan (endi mavjud emas); 5 mustaqil
   { name: '1ПК',  display: '+',  colorType: 'green',  sigLeft: 1640,sigTop: 470,  labelLeft: 1645,labelTop: 450 },
   { name: '1МК',  display: '-',  colorType: 'yellow', sigLeft: 1690,sigTop: 470,  labelLeft: 1695,labelTop: 450 },
-  { name: '3-5ПК', display: '+',  colorType: 'green',  sigLeft: 1770,sigTop: 470,  labelLeft: 1775,labelTop: 450 },
-  { name: '3-5МК', display: '-',  colorType: 'yellow', sigLeft: 1820,sigTop: 470,  labelLeft: 1825,labelTop: 450 },
+  { name: '5ПК',  display: '+',  colorType: 'green',  sigLeft: 1770,sigTop: 470,  labelLeft: 1775,labelTop: 450 },
+  { name: '5МК',  display: '-',  colorType: 'yellow', sigLeft: 1820,sigTop: 470,  labelLeft: 1825,labelTop: 450 },
 ]
 
 const SWITCH_LABELS = [
-  { text: '2',   left: 45,  top: 420 },
-  { text: '4-6', left: 185, top: 420 },
+  { text: '2-4', left: 45,  top: 420 },
+  { text: '6',   left: 185, top: 420 },
   { text: '1',   left: 1665, top: 420 },
-  { text: '3-5', left: 1795, top: 420 },
+  { text: '5',   left: 1795, top: 420 },
 ]
 
 const SECTIONS = [
@@ -70,7 +71,6 @@ const SECTIONS = [
   { name: '4-6СП', left: 585,  top: 220, label: '4' },
   { name: 'IIП',    left: 900,  top: 220, label: 'IIП' },
   { name: '3-5СП',  left: 1130, top: 220, label: '3-5СП' },
-  { name: '3-5СП',  left: 1230, top: 230, label: '3' },
   { name: '3-5СП',  left: 1170, top: 270, label: '5' },
   { name: '4-6СП', left: 670,  top: 270, label: '6' },
   { name: 'IVП',    left: 900,  top: 345, label: 'IVП' },
@@ -110,12 +110,10 @@ export default function Monosxema({ signalStates, isArchiveMode }) {
   const isFree = (name) => getState(name) === 'green'
 
   const trackState = (t) => {
-    if (t.sw) {
-      const pk = getState(t.sw + 'ПК') === 'green'
+    if (t.sw && t.pathType === 'side') {
       const mk = getState(t.sw + 'МК') === 'green'
-      const active = (t.pathType === 'straight' && pk) || (t.pathType === 'side' && mk)
       const color = isFree(t.name) ? 'free' : 'busy'
-      return active ? color : color + ' dashed'
+      return mk ? color : color + ' dashed'
     }
     return isFree(t.name) ? 'free' : 'busy'
   }
@@ -135,29 +133,29 @@ export default function Monosxema({ signalStates, isArchiveMode }) {
           <h3 className="absolute right-[240px] top-5 font-bold text-[1rem] text-muted">Miskent tomoni</h3>
 
           {TRACKS.flatMap((t, i) => {
-            /* Strelkali to'g'ri yo'nalish — ikkiga bo'lib chiziladi:
-               1) strelkagacha bo'lgan umumiy qism — ikkala yo'nalish ham shu
-                  orqali o'tadi, shuning uchun strelka holatidan qat'i nazar
-                  har doim yonib turadi;
-               2) strelkadan keyingi qism — faqat strelka to'g'riga (ПК/+)
-                  qo'yilganda yonadi, aks holda shtrix. */
-            if (t.pathType === 'straight' && t.switchAt != null) {
-              const pk = getState(t.sw + 'ПК') === 'green'
+            /* Strelkali qator bir yoki bir nechta strelka nuqtasiga qarab
+               bo'laklarga bo'linadi: har nuqtagacha bo'lgan birinchi qism —
+               umumiy, strelka holatidan qat'i nazar har doim yonadi; undan
+               keyingi har bir qism esa o'zidan oldingi strelka to'g'riga
+               (ПК/+) qo'yilgan bo'lsagina yonadi, aks holda shtrix. Ketma-ket
+               ikkita strelkasi bor qator (masalan 4-6СП: 4 va 6) uch qismga
+               bo'linadi. */
+            if (t.switchPoints && t.switchPoints.length > 0) {
               const color = isFree(t.name) ? 'free' : 'busy'
-              const sharedW = t.switchAt - t.left
-              const afterW = t.left + t.w - t.switchAt
-              return [
-                <div
-                  key={`track-${i}-shared`}
-                  className={`track ${color}`}
-                  style={{ left: t.left, top: t.top, width: sharedW, borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
-                />,
-                <div
-                  key={`track-${i}-after`}
-                  className={`track ${pk ? color : color + ' dashed'}`}
-                  style={{ left: t.switchAt, top: t.top, width: afterW, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-                />
-              ]
+              const bounds = [t.left, ...t.switchPoints.map(p => p.at), t.left + t.w]
+              const lastSeg = bounds.length - 2
+              return bounds.slice(0, -1).map((segLeft, k) => {
+                const segW = bounds[k + 1] - segLeft
+                let cls = color
+                if (k > 0) {
+                  const pk = getState(t.switchPoints[k - 1].sw + 'ПК') === 'green'
+                  if (!pk) cls += ' dashed'
+                }
+                const style = { left: segLeft, top: t.top, width: segW }
+                if (k > 0) { style.borderTopLeftRadius = 0; style.borderBottomLeftRadius = 0 }
+                if (k < lastSeg) { style.borderTopRightRadius = 0; style.borderBottomRightRadius = 0 }
+                return <div key={`track-${i}-${k}`} className={`track ${cls}`} style={style} />
+              })
             }
             return [
               <div
