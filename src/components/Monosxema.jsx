@@ -5,7 +5,9 @@ const TRACKS = [
   { name: '1ЧП',   left: 10,   top: 140,  w: 230, bg: 'rgb(216,204,204)', rot: '' },
   { name: '2СП',   left: 250,  top: 140,  w: 350, bg: 'rgb(177,163,163)', rot: '', switchPoints: [{ at: 470, sw: '2-4' }] },
   { name: 'IП',    left: 610,  top: 140,  w: 620, bg: 'rgb(177,163,163)', rot: '' },
-  { name: '1СП',   left: 1240, top: 140,  w: 260, bg: 'rgb(177,163,163)', rot: '', switchPoints: [{ at: 1367, sw: '1' }] },
+  // 1СП toq (Miskent) tomonda — poyezd yo'nalishi teskari: tashqi/kirish
+  // tomon 1НП (o'ngda), shuning uchun reverse:true — umumiy qism o'ngda.
+  { name: '1СП',   left: 1240, top: 140,  w: 260, bg: 'rgb(177,163,163)', rot: '', switchPoints: [{ at: 1367, sw: '1' }], reverse: true },
   { name: '1НП',   left: 1510, top: 140,  w: 290, bg: 'rgb(177,163,163)', rot: '' },
   // 4-6СП qatorida ikkita strelka nuqtasi bor: 4 (2 bilan spaeng) va 6 (mustaqil)
   { name: '4-6СП', left: 500, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 538, sw: '2-4' }, { at: 680, sw: '6' }] },
@@ -14,8 +16,9 @@ const TRACKS = [
   // rot:-45deg — qatorga shu yerda tutashadi, xuddi 1-strelkadagi kabi
   // trigonometrik hisob bilan). Qator 1250'da tugaydi — aynan shu yerda
   // strelka 3'ning (demontaj qilingan, doim oddiy rangdagi) qoldiq yo'li
-  // tutashadi, undan o'ngga hech narsa yo'q.
-  { name: '3-5СП', left: 1100, top: 260,  w: 150, bg: '', rot: '', switchPoints: [{ at: 1167, sw: '5' }] },
+  // tutashadi, undan o'ngga hech narsa yo'q. Bu ham toq tomonda — reverse:
+  // true, umumiy qism o'ng (1250) tomonda.
+  { name: '3-5СП', left: 1100, top: 260,  w: 150, bg: '', rot: '', switchPoints: [{ at: 1167, sw: '5' }], reverse: true },
   { name: 'IVП',   left: 801,  top: 380,  w: 249, bg: '', rot: '' },
   { name: '2СП',   left: 470,  top: 140,  w: 90,  bg: 'rgb(177,163,163)', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '6', pathType: 'side' },
@@ -156,8 +159,15 @@ export default function Monosxema({ signalStates, isArchiveMode }) {
               return bounds.slice(0, -1).map((segLeft, k) => {
                 const segW = bounds[k + 1] - segLeft
                 let cls = color
-                if (k > 0) {
-                  const pk = getState(t.switchPoints[k - 1].sw + 'ПК') === 'green'
+                // t.reverse: toq (Miskent) tomondagi strelkalar (1, 5) uchun
+                // poyezd yo'nalishi teskari — tashqi/kirish tomon o'ngda,
+                // shuning uchun umumiy (doim yonadigan) qism ENG O'NGDAGI
+                // bo'lak, shartli qismlar esa o'zidan KEYINGI strelka bilan
+                // boshqariladi (chapdan-o'ngga o'qilganda).
+                const isShared = t.reverse ? k === lastSeg : k === 0
+                if (!isShared) {
+                  const governIdx = t.reverse ? k : k - 1
+                  const pk = getState(t.switchPoints[governIdx].sw + 'ПК') === 'green'
                   if (!pk) cls += ' dashed'
                 }
                 const style = { left: segLeft, top: t.top, width: segW }
