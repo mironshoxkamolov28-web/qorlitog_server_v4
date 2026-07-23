@@ -10,17 +10,21 @@ const TRACKS = [
   // 4-6СП qatorida ikkita strelka nuqtasi bor: 4 (2 bilan spaeng) va 6 (mustaqil)
   { name: '4-6СП', left: 500, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 538, sw: '2-4' }, { at: 680, sw: '6' }] },
   { name: 'IIП',   left: 770,  top: 260,  w: 320, bg: '', rot: '' },
-  // 3-5СП: strelka 5 nuqtasidan (1250) keyin to'g'riga davom etadigan qism
-  // tupik (hech qayerga ulanmaydi) — shuning uchun qator shu yerda tugaydi,
-  // undan keyin faqat diagonal (5-strelka, pastda) davom etadi.
-  { name: '3-5СП', left: 1100, top: 260,  w: 150, bg: '', rot: '' },
+  // 3-5СП: haqiqiy strelka 5 nuqtasi ≈1167 (pastdagi diagonal — 1110,320,
+  // rot:-45deg — qatorga shu yerda tutashadi, xuddi 1-strelkadagi kabi
+  // trigonometrik hisob bilan).
+  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 1167, sw: '5' }] },
   { name: 'IVП',   left: 801,  top: 380,  w: 249, bg: '', rot: '' },
   { name: '2СП',   left: 470,  top: 140,  w: 90,  bg: 'rgb(177,163,163)', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '6', pathType: 'side' },
   { name: '4-6СП', left: 538, top: 213,  w: 65,  bg: '', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '1СП',   left: 1310, top: 200,  w: 80,  bg: 'rgb(177,163,163)', rot: '-45deg', sw: '1', pathType: 'side' },
-  { name: '3-5СП', left: 1250, top: 260,  w: 80,  bg: '', rot: '-45deg', sw: '5', pathType: 'side' },
-  // Strelka 3 demontaj qilingan — uning tupik (o'chirilgan) yo'l bo'lagi olib tashlandi
+  // Strelka 3 demontaj qilingan — jismoniy yo'l qolgan, lekin strelka
+  // mantig'i yo'q, shuning uchun sw/pathType'siz — oddiy 3-5SP rangida
+  // (band/bo'sh) yonadi, hech qachon shtrix bo'lmaydi.
+  { name: '3-5СП', left: 1250, top: 260,  w: 80,  bg: '', rot: '-45deg' },
+  // Haqiqiy strelka 5'ning yo'li — pastdan (IVП tomondan) qatorga tutashadi
+  { name: '3-5СП', left: 1110, top: 320,  w: 80,  bg: '', rot: '-45deg', sw: '5', pathType: 'side' },
   { name: 'IVП',   left: 1050, top: 380,  w: 75,  bg: '', rot: '-45deg' },
   { name: 'IVП',   left: 802,  top: 380,  w: 95,  bg: '', rot: '-135deg' },
 ]
