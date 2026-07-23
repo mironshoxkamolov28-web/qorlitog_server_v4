@@ -55,7 +55,7 @@ void connectWiFi() {
 // ZMPT101B'dan RMS (effektiv) qiymatni hisoblash: bir necha o'nlab
 // millisekund davomida (~50Hz'ning bir necha davri) o'qib, o'rtacha (bias)
 // atrofidagi tebranishning kvadrat o'rtachasi ildizini topadi.
-float readRawRms(int pin) {
+float readRawRmsOnce(int pin) {
   const int samples = 400;
   long sum = 0;
   static int readings[samples];
@@ -71,6 +71,27 @@ float readRawRms(int pin) {
     sumSq += diff * diff;
   }
   return sqrt(sumSq / samples);
+}
+
+// Bitta o'lchov WiFi radiosi tufayli tasodifan buzilib qolishi mumkin
+// (ADC o'qishlari orasidagi vaqt bir zumga notekis bo'lib qolsa), shuning
+// uchun 5 marta o'lchab, medianasini (o'rtadagi qiymatini) olamiz — eng
+// yuqori yoki eng past (shovqinli) natija shu bilan e'tiborga olinmaydi,
+// yakuniy qiymat multimetrga yaqinroq va barqaror bo'ladi.
+float readRawRms(int pin) {
+  const int N = 5;
+  float vals[N];
+  for (int i = 0; i < N; i++) {
+    vals[i] = readRawRmsOnce(pin);
+  }
+  for (int i = 0; i < N - 1; i++) {
+    for (int j = 0; j < N - 1 - i; j++) {
+      if (vals[j] > vals[j + 1]) {
+        float tmp = vals[j]; vals[j] = vals[j + 1]; vals[j + 1] = tmp;
+      }
+    }
+  }
+  return vals[N / 2];
 }
 
 void sendVoltages() {
