@@ -19,10 +19,9 @@ const TRACKS = [
   { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '6', pathType: 'side' },
   { name: '4-6СП', left: 538, top: 213,  w: 65,  bg: '', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '1СП',   left: 1310, top: 200,  w: 80,  bg: 'rgb(177,163,163)', rot: '-45deg', sw: '1', pathType: 'side' },
-  // Strelka 3 demontaj qilingan — jismoniy yo'l qolgan, lekin strelka
-  // mantig'i yo'q, shuning uchun sw/pathType'siz — oddiy 3-5SP rangida
-  // (band/bo'sh) yonadi, hech qachon shtrix bo'lmaydi.
-  { name: '3-5СП', left: 1250, top: 260,  w: 80,  bg: '', rot: '-45deg' },
+  // Strelka 3 demontaj qilingan — endi tupikka o'tkazib beradigan strelka
+  // yo'q, ya'ni u yo'l butunlay uzilgan — shuning uchun bu yo'l bo'lagi
+  // umuman chizilmaydi (o'chirilgan).
   // Haqiqiy strelka 5'ning yo'li — pastdan (IVП tomondan) qatorga tutashadi
   { name: '3-5СП', left: 1110, top: 320,  w: 80,  bg: '', rot: '-45deg', sw: '5', pathType: 'side' },
   { name: 'IVП',   left: 1050, top: 380,  w: 75,  bg: '', rot: '-45deg' },
