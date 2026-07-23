@@ -10,7 +10,10 @@ const TRACKS = [
   // 4-6СП qatorida ikkita strelka nuqtasi bor: 4 (2 bilan spaeng) va 6 (mustaqil)
   { name: '4-6СП', left: 500, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 538, sw: '2-4' }, { at: 680, sw: '6' }] },
   { name: 'IIП',   left: 770,  top: 260,  w: 320, bg: '', rot: '' },
-  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 1250, sw: '5' }] },
+  // 3-5СП: strelka 5 nuqtasidan (1250) keyin to'g'riga davom etadigan qism
+  // tupik (hech qayerga ulanmaydi) — shuning uchun qator shu yerda tugaydi,
+  // undan keyin faqat diagonal (5-strelka, pastda) davom etadi.
+  { name: '3-5СП', left: 1100, top: 260,  w: 150, bg: '', rot: '' },
   { name: 'IVП',   left: 801,  top: 380,  w: 249, bg: '', rot: '' },
   { name: '2СП',   left: 470,  top: 140,  w: 90,  bg: 'rgb(177,163,163)', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '6', pathType: 'side' },
