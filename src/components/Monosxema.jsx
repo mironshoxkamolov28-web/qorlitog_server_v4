@@ -12,8 +12,10 @@ const TRACKS = [
   { name: 'IIП',   left: 770,  top: 260,  w: 320, bg: '', rot: '' },
   // 3-5СП: haqiqiy strelka 5 nuqtasi ≈1167 (pastdagi diagonal — 1110,320,
   // rot:-45deg — qatorga shu yerda tutashadi, xuddi 1-strelkadagi kabi
-  // trigonometrik hisob bilan).
-  { name: '3-5СП', left: 1100, top: 260,  w: 260, bg: '', rot: '', switchPoints: [{ at: 1167, sw: '5' }] },
+  // trigonometrik hisob bilan). Qator 1250'da tugaydi — aynan shu yerda
+  // strelka 3'ning (demontaj qilingan, doim oddiy rangdagi) qoldiq yo'li
+  // tutashadi, undan o'ngga hech narsa yo'q.
+  { name: '3-5СП', left: 1100, top: 260,  w: 150, bg: '', rot: '', switchPoints: [{ at: 1167, sw: '5' }] },
   { name: 'IVП',   left: 801,  top: 380,  w: 249, bg: '', rot: '' },
   { name: '2СП',   left: 470,  top: 140,  w: 90,  bg: 'rgb(177,163,163)', rot: '45deg', sw: '2-4', pathType: 'side' },
   { name: '4-6СП', left: 680, top: 260,  w: 70,  bg: '', rot: '45deg', sw: '6', pathType: 'side' },
